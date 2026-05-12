@@ -1,4 +1,4 @@
-# E-BEWS USA — Hantavirus Digital Epidemiology Command Center
+#Hantavirus Digital Epidemiology Command Center - USA
 
 [![Pages](https://img.shields.io/badge/demo-GitHub%20Pages-0ea5e9)](https://<your-github-username>.github.io/ebews-usa-dashboard/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
