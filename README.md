@@ -1,4 +1,4 @@
-# Hantavirus Digital Epidemiology Command Center
+# E-BEWS USA — Hantavirus Digital Epidemiology Command Center
 
 [![Pages](https://img.shields.io/badge/demo-GitHub%20Pages-0ea5e9)](https://<your-github-username>.github.io/ebews-usa-dashboard/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -134,7 +134,7 @@ A small helper to re-embed is on the to-do list (see [issues](../../issues)).
 
 If you use this dashboard, see [CITATION.cff](CITATION.cff) or:
 
-> Akshaya Bhagavathula * Hantavirus Digital Epidemiology Command Center - USA.* v1.0.0, 2026. https://github.com/<aidea1>/ebews-usa-dashboard
+> Akshaya. *E-BEWS USA — Hantavirus Digital Epidemiology Command Center.* v1.0.0, 2026. https://github.com/<your-github-username>/ebews-usa-dashboard
 
 ---
 

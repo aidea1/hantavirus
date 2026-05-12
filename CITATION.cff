@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this dashboard, please cite as below."
+title: "E-BEWS USA — Hantavirus Digital Epidemiology Command Center"
+authors:
+  - family-names: Akshaya
+abstract: >-
+  An Environmental-Behavioral Early Warning System (E-BEWS) dashboard for
+  Hantavirus that fuses Nielsen DMA-resolution Google Health Trends search
+  probabilities with the ArcGIS Tracking_Hantavirus_2026 FeatureServer.
+  Uses Grouped Expression Methodology to overcome k-anonymity suppression in
+  rural Western US DMAs.
+version: "1.0.0"
+date-released: "2026-05-12"
+license: MIT
+keywords:
+  - digital epidemiology
+  - infodemiology
+  - hantavirus
+  - andes virus
+  - google health trends
+  - nielsen DMA
+  - early warning system

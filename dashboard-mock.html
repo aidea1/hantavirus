@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>E-BEWS — Hantavirus Public Health Command Center</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js" crossorigin></script>
+<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js" crossorigin></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root { color-scheme: dark; }
+  html,body { background:#020617; color:#e2e8f0; font-family: ui-sans-serif, system-ui, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  .glow-red    { box-shadow: 0 0 24px rgba(239,68,68,.35), inset 0 0 18px rgba(239,68,68,.08); border-color: rgba(239,68,68,.55); }
+  .glow-amber  { box-shadow: 0 0 22px rgba(245,158,11,.30), inset 0 0 14px rgba(245,158,11,.08); border-color: rgba(245,158,11,.5); }
+  .glow-em     { box-shadow: 0 0 18px rgba(16,185,129,.25), inset 0 0 12px rgba(16,185,129,.06); border-color: rgba(16,185,129,.45); }
+  .glow-cyan   { box-shadow: 0 0 18px rgba(34,211,238,.22), inset 0 0 12px rgba(34,211,238,.06); border-color: rgba(34,211,238,.45); }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(148,163,184,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148,163,184,.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .pulse-dot::after{
+    content:""; display:inline-block; width:8px; height:8px; border-radius:9999px;
+    background:#ef4444; margin-left:8px;
+    box-shadow:0 0 0 0 rgba(239,68,68,.6); animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse {
+    0%{box-shadow:0 0 0 0 rgba(239,68,68,.55);}
+    70%{box-shadow:0 0 0 12px rgba(239,68,68,0);}
+    100%{box-shadow:0 0 0 0 rgba(239,68,68,0);}
+  }
+  .scroll-thin::-webkit-scrollbar{ width:6px; height:6px;}
+  .scroll-thin::-webkit-scrollbar-thumb{ background:#1e293b; border-radius:3px;}
+</style>
+</head>
+<body class="min-h-screen">
+<div id="root"></div>
+
+<script type="text/babel" data-presets="env,react">
+const { useMemo, useState, useEffect } = React;
+const {
+  ResponsiveContainer, ComposedChart, LineChart, Line, Area, XAxis, YAxis,
+  CartesianGrid, Tooltip, Legend, ReferenceLine, ReferenceArea, BarChart, Bar, Cell
+} = Recharts;
+
+/* ----------------------------------------------------------------------------
+   E-BEWS — Environmental-Behavioral Early Warning System
+   Single-file React command-center dashboard.
+   Data: synthetic ecological pulses calibrated to mimic
+         Google Health Trends DMA-level Hantavirus search probabilities.
+---------------------------------------------------------------------------- */
+
+// ----- DMA registry (Western US, approximate lat/lng for command-center map) -----
+const DMA_REG = [
+  { code: 790, name: "Albuquerque-Santa Fe NM",  lat:35.08, lng:-106.65, region:"Four Corners",  baseEnv:0.42 },
+  { code: 634, name: "Amarillo TX",              lat:35.22, lng:-101.83, region:"Plains",        baseEnv:0.18 },
+  { code: 800, name: "Bakersfield CA",           lat:35.37, lng:-119.02, region:"Pacific SW",    baseEnv:0.12 },
+  { code: 821, name: "Bend OR",                  lat:44.06, lng:-121.31, region:"Pacific NW",    baseEnv:0.30 },
+  { code: 756, name: "Billings MT",              lat:45.79, lng:-108.55, region:"N. Rockies",    baseEnv:0.28 },
+  { code: 757, name: "Boise ID",                 lat:43.61, lng:-116.20, region:"N. Rockies",    baseEnv:0.26 },
+  { code: 754, name: "Butte-Bozeman MT",         lat:45.68, lng:-111.04, region:"N. Rockies",    baseEnv:0.31 },
+  { code: 767, name: "Casper-Riverton WY",       lat:42.85, lng:-106.32, region:"N. Rockies",    baseEnv:0.27 },
+  { code: 759, name: "Cheyenne WY",              lat:41.14, lng:-104.82, region:"N. Rockies",    baseEnv:0.22 },
+  { code: 868, name: "Chico-Redding CA",         lat:40.59, lng:-122.39, region:"Pacific NW",    baseEnv:0.20 },
+  { code: 752, name: "Colorado Springs-Pueblo",  lat:38.83, lng:-104.82, region:"Four Corners",  baseEnv:0.30 },
+  { code: 751, name: "Denver CO",                lat:39.74, lng:-104.99, region:"Four Corners",  baseEnv:0.34 },
+  { code: 765, name: "El Paso TX",               lat:31.76, lng:-106.49, region:"Four Corners",  baseEnv:0.33 },
+  { code: 801, name: "Eugene OR",                lat:44.05, lng:-123.09, region:"Pacific NW",    baseEnv:0.22 },
+  { code: 724, name: "Fargo-Valley City ND",     lat:46.88, lng:-96.79,  region:"Plains",        baseEnv:0.16 },
+  { code: 866, name: "Fresno-Visalia CA",        lat:36.74, lng:-119.78, region:"Pacific SW",    baseEnv:0.15 },
+  { code: 773, name: "Grand Junction CO",        lat:39.06, lng:-108.55, region:"Four Corners",  baseEnv:0.38 },
+  { code: 755, name: "Great Falls MT",           lat:47.49, lng:-111.30, region:"N. Rockies",    baseEnv:0.24 },
+  { code: 758, name: "Idaho Falls-Pocatello",    lat:43.49, lng:-112.04, region:"N. Rockies",    baseEnv:0.29 },
+  { code: 839, name: "Las Vegas NV",             lat:36.17, lng:-115.14, region:"Pacific SW",    baseEnv:0.18 },
+  { code: 803, name: "Los Angeles CA",           lat:34.05, lng:-118.24, region:"Pacific SW",    baseEnv:0.10 },
+  { code: 651, name: "Lubbock TX",               lat:33.58, lng:-101.86, region:"Plains",        baseEnv:0.17 },
+  { code: 813, name: "Medford-Klamath Falls",    lat:42.33, lng:-122.86, region:"Pacific NW",    baseEnv:0.23 },
+  { code: 687, name: "Minot-Bismarck ND",        lat:46.81, lng:-100.78, region:"Plains",        baseEnv:0.19 },
+  { code: 762, name: "Missoula MT",              lat:46.87, lng:-113.99, region:"N. Rockies",    baseEnv:0.28 },
+  { code: 633, name: "Odessa-Midland TX",        lat:31.84, lng:-102.36, region:"Plains",        baseEnv:0.21 },
+  { code: 753, name: "Phoenix AZ",               lat:33.45, lng:-112.07, region:"Four Corners",  baseEnv:0.36 },
+  { code: 820, name: "Portland OR",              lat:45.51, lng:-122.68, region:"Pacific NW",    baseEnv:0.32 },
+  { code: 764, name: "Rapid City SD",            lat:44.08, lng:-103.23, region:"N. Rockies",    baseEnv:0.27 },
+  { code: 811, name: "Reno NV",                  lat:39.53, lng:-119.81, region:"Pacific SW",    baseEnv:0.24 },
+  { code: 862, name: "Sacramento-Stockton CA",   lat:38.58, lng:-121.49, region:"Pacific SW",    baseEnv:0.14 },
+  { code: 770, name: "Salt Lake City UT",        lat:40.76, lng:-111.89, region:"Four Corners",  baseEnv:0.35 },
+  { code: 825, name: "San Diego CA",             lat:32.72, lng:-117.16, region:"Pacific SW",    baseEnv:0.11 },
+  { code: 807, name: "San Francisco-Oakland",    lat:37.77, lng:-122.42, region:"Pacific SW",    baseEnv:0.13 },
+  { code: 819, name: "Seattle-Tacoma WA",        lat:47.61, lng:-122.33, region:"Pacific NW",    baseEnv:0.29 },
+  { code: 725, name: "Sioux Falls SD",           lat:43.55, lng:-96.73,  region:"Plains",        baseEnv:0.18 },
+  { code: 881, name: "Spokane WA",               lat:47.66, lng:-117.43, region:"Pacific NW",    baseEnv:0.26 },
+  { code: 789, name: "Tucson (Sierra Vista) AZ", lat:32.22, lng:-110.93, region:"Four Corners",  baseEnv:0.33 },
+  { code: 760, name: "Twin Falls ID",            lat:42.56, lng:-114.46, region:"N. Rockies",    baseEnv:0.28 },
+  { code: 810, name: "Yakima-Pasco-Kennewick",   lat:46.60, lng:-120.51, region:"Pacific NW",    baseEnv:0.25 },
+  { code: 771, name: "Yuma AZ-El Centro CA",     lat:32.69, lng:-114.63, region:"Four Corners",  baseEnv:0.31 },
+];
+
+// ------------------------- Mock data generator ----------------------------------
+// Mimics Hantavirus ecological pulses: precipitation -> vegetation -> Peromyscus
+// population -> behavioral exposure (cleaning sheds, droppings) -> clinical intent.
+// Behavioral signal LEADS clinical by ~14d. Precipitation leads ecology by ~12 mo.
+function seedRand(seed){
+  let s = seed >>> 0;
+  return () => { s = (s*1664525 + 1013904223) >>> 0; return (s & 0xffffffff) / 0x100000000; };
+}
+function dayStr(d){ return d.toISOString().slice(0,10); }
+function genTimeSeries({ days=240, startSeed=42 }={}){
+  const rnd = seedRand(startSeed);
+  const start = new Date();
+  start.setDate(start.getDate() - days + 1);
+  // Precipitation signal (last year), then ecology + behavior (this year, lag 365 days simulated as scaled lag).
+  // We collapse the 12-mo lag into the visible window by using a phase-shifted sinusoid for ecology.
+  const out = [];
+  for(let i=0;i<days;i++){
+    const t = i/days;
+    const date = new Date(start); date.setDate(start.getDate()+i);
+    // simulated precipitation from prior year (already integrated, just shown for reference)
+    const precipPrior = 0.35 + 0.25*Math.sin(2*Math.PI*(t+0.15)) + 0.06*(rnd()-0.5);
+    // Ecology pulse: rodent reservoir bloom following lagged precipitation
+    const ecology = 0.28 + 0.30*Math.sin(2*Math.PI*(t-0.05)) + 0.05*(rnd()-0.5);
+    // Behavioral / environmental search probability — leads clinical by ~14d
+    let behavior = Math.max(0, 0.20 + 0.55*Math.max(0, Math.sin(2*Math.PI*(t-0.02))) + 0.04*(rnd()-0.5));
+    // Inject 2 sharp pulses (spring shed-cleaning + post-storm reservoir bloom)
+    const pulseA = Math.exp(-Math.pow((i-Math.floor(days*0.35))/8,2)) * 0.9;
+    const pulseB = Math.exp(-Math.pow((i-Math.floor(days*0.78))/10,2)) * 0.75;
+    behavior = Math.min(1, behavior + pulseA + 0.4*pulseB);
+    // Environmental risk (composite of ecology + reported droppings searches)
+    const envRisk = Math.min(1, 0.5*ecology + 0.5*behavior + 0.03*(rnd()-0.5));
+    // Clinical intent lags behavior by ~14 days
+    const lag = 14;
+    const past = i-lag >= 0 ? out[i-lag] : null;
+    const clinical = past
+      ? Math.min(1, 0.85*past.Exposure_Behavior + 0.05 + 0.04*(rnd()-0.5))
+      : Math.max(0, 0.12 + 0.04*(rnd()-0.5));
+    out.push({
+      Date: dayStr(date),
+      Precip_PriorYear: +precipPrior.toFixed(3),
+      Environmental_Risk: +envRisk.toFixed(3),
+      Exposure_Behavior:  +behavior.toFixed(3),
+      Hantavirus_Topic:   +clinical.toFixed(3),
+    });
+  }
+  return out;
+}
+
+// Per-DMA panel: scale national time-series by regional baseline + idiosyncratic noise.
+function genDMASeries(national){
+  const all = [];
+  DMA_REG.forEach((dma, idx) => {
+    const rnd = seedRand(1000 + idx*7);
+    // regional amplification
+    const regionAmp =
+      dma.region === "Four Corners" ? 1.55 :
+      dma.region === "N. Rockies"   ? 1.25 :
+      dma.region === "Pacific NW"   ? 1.05 :
+      dma.region === "Pacific SW"   ? 0.70 : 0.55;
+    // idiosyncratic surge windows
+    const surgeIdx = Math.floor(rnd()*national.length);
+    national.forEach((row, i) => {
+      const idio = 0.08*(rnd()-0.5);
+      const surge = Math.exp(-Math.pow((i-surgeIdx)/6,2)) * (dma.region==="Four Corners" ? 0.6 : 0.25);
+      const prob = Math.max(0, Math.min(1,
+        row.Hantavirus_Topic*regionAmp*0.65 + row.Exposure_Behavior*regionAmp*0.35 + surge + idio
+      ));
+      all.push({
+        Date: row.Date,
+        DMA_Code: dma.code,
+        DMA_Name: dma.name,
+        Region: dma.region,
+        Probability: +prob.toFixed(3),
+      });
+    });
+  });
+  return all;
+}
+
+// 7-day rolling mean per DMA
+function rolling7(dmaSeries){
+  const byDMA = {};
+  dmaSeries.forEach(r => { (byDMA[r.DMA_Code] ||= []).push(r); });
+  const out = [];
+  Object.values(byDMA).forEach(arr => {
+    arr.sort((a,b)=> a.Date.localeCompare(b.Date));
+    for(let i=0;i<arr.length;i++){
+      const lo = Math.max(0, i-6);
+      const win = arr.slice(lo, i+1);
+      const mean = win.reduce((s,x)=>s+x.Probability,0)/win.length;
+      out.push({ ...arr[i], P7: +mean.toFixed(3) });
+    }
+  });
+  return out;
+}
+
+// ============================== UI primitives ==============================
+function Card({ title, subtitle, glow, icon, children, right }){
+  const cls = glow ? `glow-${glow}` : "";
+  return (
+    <div className={`bg-slate-900/70 backdrop-blur rounded-2xl border border-slate-800 p-4 ${cls}`}>
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <div className="flex items-center gap-2 text-slate-100 font-semibold tracking-wide">
+            {icon}
+            <span>{title}</span>
+          </div>
+          {subtitle && <div className="text-xs text-slate-400 mt-0.5">{subtitle}</div>}
+        </div>
+        {right}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Stat({ label, value, sub, tone="slate" }){
+  const map = {
+    red:    "text-red-400",
+    amber:  "text-amber-400",
+    cyan:   "text-cyan-300",
+    em:     "text-emerald-400",
+    slate:  "text-slate-200",
+  };
+  return (
+    <div className="flex flex-col">
+      <span className="uppercase tracking-widest text-[10px] text-slate-500">{label}</span>
+      <span className={`text-2xl font-semibold mono ${map[tone]}`}>{value}</span>
+      {sub && <span className="text-xs text-slate-400 mt-0.5">{sub}</span>}
+    </div>
+  );
+}
+
+function Pill({ color="slate", children }){
+  const map = {
+    red:   "bg-red-500/15 text-red-300 border-red-500/40",
+    amber: "bg-amber-500/15 text-amber-300 border-amber-500/40",
+    em:    "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
+    cyan:  "bg-cyan-500/15 text-cyan-300 border-cyan-500/40",
+    slate: "bg-slate-700/30 text-slate-300 border-slate-600/40",
+  };
+  return <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] mono ${map[color]}`}>{children}</span>;
+}
+
+// ============================== Map (custom SVG) ==============================
+function ProjMap({ data, onHover }){
+  // simple equirectangular projection for Western US
+  const W = 720, H = 460;
+  const lonMin=-125, lonMax=-95, latMin=30, latMax=49.5;
+  const x = lon => ( (lon-lonMin) / (lonMax-lonMin) ) * W;
+  const y = lat => H - ( (lat-latMin) / (latMax-latMin) ) * H;
+  // intensity color (biohazard ramp)
+  const ramp = (v) => {
+    if (v < 0.15) return "#0f172a";
+    if (v < 0.30) return "#7c2d12";
+    if (v < 0.45) return "#b45309";
+    if (v < 0.60) return "#dc2626";
+    if (v < 0.75) return "#ef4444";
+    return "#f97316";
+  };
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full">
+      {/* Background ocean / land mass approximations (super-rough) */}
+      <rect x="0" y="0" width={W} height={H} fill="#020617"/>
+      <g opacity="0.5">
+        {/* horizontal grid */}
+        {Array.from({length:8}).map((_,i)=>(
+          <line key={i} x1="0" x2={W} y1={H*i/8} y2={H*i/8} stroke="#1e293b" strokeWidth="1" />
+        ))}
+        {Array.from({length:10}).map((_,i)=>(
+          <line key={i} x1={W*i/10} x2={W*i/10} y1="0" y2={H} stroke="#1e293b" strokeWidth="1" />
+        ))}
+      </g>
+      {/* Four Corners highlight */}
+      <rect x={x(-110)} y={y(38.5)} width={x(-107)-x(-110)} height={y(35.5)-y(38.5)}
+            fill="none" stroke="rgba(239,68,68,.45)" strokeDasharray="4 4" />
+      <text x={x(-109.5)} y={y(38.7)} fontSize="11" fill="#fca5a5" className="mono">Four Corners</text>
+      {/* Pacific NW highlight */}
+      <rect x={x(-124)} y={y(48.5)} width={x(-117)-x(-124)} height={y(42.5)-y(48.5)}
+            fill="none" stroke="rgba(34,211,238,.45)" strokeDasharray="4 4" />
+      <text x={x(-123.5)} y={y(48.7)} fontSize="11" fill="#67e8f9" className="mono">Pacific NW</text>
+
+      {data.map(d => {
+        const cx = x(d.lng), cy = y(d.lat);
+        const r = 4 + d.P7 * 16;
+        const fill = ramp(d.P7);
+        const glow = d.P7 > 0.5;
+        return (
+          <g key={d.DMA_Code} onMouseEnter={()=>onHover && onHover(d)} onMouseLeave={()=>onHover && onHover(null)}>
+            {glow && <circle cx={cx} cy={cy} r={r+8} fill={fill} opacity="0.20"/>}
+            <circle cx={cx} cy={cy} r={r} fill={fill} opacity="0.85" stroke="#fde68a" strokeOpacity={d.P7>0.6?0.6:0} strokeWidth="1"/>
+            <text x={cx+r+3} y={cy+3} fontSize="9" fill="#cbd5e1" className="mono">
+              {d.DMA_Name.split(/[ ,-]/)[0]}
+            </text>
+          </g>
+        );
+      })}
+      {/* legend */}
+      <g transform={`translate(20, ${H-30})`}>
+        {[0.10,0.25,0.4,0.55,0.7,0.85].map((v,i)=>(
+          <g key={i} transform={`translate(${i*70},0)`}>
+            <rect width="60" height="10" fill={ramp(v)} />
+            <text x="0" y="22" fontSize="10" fill="#94a3b8" className="mono">{v.toFixed(2)}</text>
+          </g>
+        ))}
+        <text x="0" y="-5" fontSize="10" fill="#94a3b8" className="mono">P̄₇ (7-day rolling probability)</text>
+      </g>
+    </svg>
+  );
+}
+
+// ============================== Main app ==============================
+function App(){
+  const national = useMemo(()=> genTimeSeries({ days: 240, startSeed: 7 }), []);
+  const dmaSeries = useMemo(()=> rolling7(genDMASeries(national)), [national]);
+
+  // current snapshot = last date
+  const lastDate = national[national.length-1].Date;
+  const todaySnap = useMemo(()=> {
+    const byDMA = {};
+    dmaSeries.forEach(r => { byDMA[r.DMA_Code] = r; }); // last wins due to date order
+    // override: pick only rows for lastDate
+    const out = dmaSeries.filter(r => r.Date === lastDate).map(r => {
+      const reg = DMA_REG.find(d => d.code === r.DMA_Code);
+      return { ...r, lat: reg.lat, lng: reg.lng };
+    });
+    return out;
+  }, [dmaSeries, lastDate]);
+
+  // surge velocity Δ = P7(today) - P7(7d ago) / baseline
+  const surge = useMemo(()=>{
+    const out = [];
+    DMA_REG.forEach(d => {
+      const arr = dmaSeries.filter(r => r.DMA_Code === d.code);
+      const last = arr[arr.length-1];
+      const prev = arr[arr.length-8] || arr[0];
+      const baseline = arr.slice(0, Math.floor(arr.length*0.4)).reduce((s,x)=>s+x.P7,0) / Math.max(1, Math.floor(arr.length*0.4));
+      const delta = last.P7 - prev.P7;
+      const zlike = baseline>0 ? (last.P7 - baseline) / Math.max(0.05, baseline) : 0;
+      out.push({
+        ...d, P7: last.P7, prev: prev.P7, delta: +delta.toFixed(3),
+        baseline: +baseline.toFixed(3), breaksSilence: zlike > 1.0,
+        velocity: +(delta*100).toFixed(1),
+      });
+    });
+    out.sort((a,b)=> b.velocity - a.velocity);
+    return out;
+  }, [dmaSeries]);
+
+  // Risk level (national)
+  const natNow = national[national.length-1];
+  const advisory = (() => {
+    const x = 0.5*natNow.Exposure_Behavior + 0.5*natNow.Hantavirus_Topic;
+    if (x > 0.55) return { level:"HIGH", tone:"red", note:"Sustained behavioral lead-time with clinical convergence." };
+    if (x > 0.30) return { level:"ELEVATED", tone:"amber", note:"Behavioral signal rising; clinical intent trailing by ~14d." };
+    return { level:"LOW", tone:"em", note:"Baseline ecological dormancy; routine vigilance." };
+  })();
+
+  // EKG lead-time gap: largest peak of behavior - aligned clinical
+  const ekgGap = useMemo(()=>{
+    let bMax = -1, bIdx = -1, cMax=-1, cIdx=-1;
+    national.forEach((r,i)=>{
+      if (r.Exposure_Behavior > bMax){ bMax = r.Exposure_Behavior; bIdx = i; }
+      if (r.Hantavirus_Topic > cMax){ cMax = r.Hantavirus_Topic; cIdx = i; }
+    });
+    return { bDate: national[bIdx].Date, cDate: national[cIdx].Date, days: cIdx - bIdx };
+  }, [national]);
+
+  const [hover, setHover] = useState(null);
+  const peak = surge[0];
+  const mostActive = surge.slice().sort((a,b)=> b.P7 - a.P7)[0];
+  const growth = (() => {
+    const last = natNow;
+    const prev = national[national.length-8];
+    return ((last.Exposure_Behavior - prev.Exposure_Behavior) / Math.max(0.01, prev.Exposure_Behavior) * 100).toFixed(1);
+  })();
+
+  useEffect(()=>{ if (window.lucide) window.lucide.createIcons(); });
+
+  // icons (lucide via inline svg fallbacks)
+  const I = (name, cls="w-4 h-4") => <i data-lucide={name} className={cls}></i>;
+
+  return (
+    <div className="grid-bg min-h-screen">
+      {/* Top bar */}
+      <header className="sticky top-0 z-30 bg-slate-950/85 backdrop-blur border-b border-slate-800/80">
+        <div className="max-w-[1500px] mx-auto px-5 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-red-500/15 border border-red-500/40 flex items-center justify-center">
+              {I("biohazard","w-5 h-5 text-red-400")}
+            </div>
+            <div>
+              <div className="text-sm uppercase tracking-[0.25em] text-slate-400">E-BEWS · Hantavirus Command Center</div>
+              <div className="text-xs text-slate-500 mono">Environmental-Behavioral Early Warning System · DMA Resolution</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 text-xs text-slate-400">
+            <span className="pulse-dot">LIVE</span>
+            <span className="mono">{lastDate}</span>
+            <Pill color={advisory.tone}>{advisory.level} RISK</Pill>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-[1500px] mx-auto px-5 py-5 grid grid-cols-12 gap-5">
+
+        {/* Executive summary cards */}
+        <section className="col-span-12 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card title="Peak Search Intensity" subtitle="7-day rolling Pmax, all DMAs" glow="red" icon={I("activity","w-4 h-4 text-red-400")}>
+            <Stat label="Probability" value={peak.P7.toFixed(2)} sub={peak.name} tone="red"/>
+          </Card>
+          <Card title="Most Active DMA" subtitle="Highest sustained probability" glow="amber" icon={I("map-pin","w-4 h-4 text-amber-400")}>
+            <Stat label="DMA" value={mostActive.name.split(" ")[0]} sub={`${mostActive.region} · P̄₇ ${mostActive.P7.toFixed(2)}`} tone="amber"/>
+          </Card>
+          <Card title="7-Day Growth (Behavior)" subtitle="Δ Exposure_Behavior vs 7d ago" glow="cyan" icon={I("trending-up","w-4 h-4 text-cyan-300")}>
+            <Stat label="National" value={`${growth}%`} sub="Cleaning / droppings / shed semantics" tone="cyan"/>
+          </Card>
+          <Card title="Behavioral Lead-Time" subtitle="Behavior peak → Clinical peak" glow="em" icon={I("timer","w-4 h-4 text-emerald-400")}>
+            <Stat label="Δ days" value={`${ekgGap.days}`} sub={`${ekgGap.bDate} → ${ekgGap.cDate}`} tone="em"/>
+          </Card>
+        </section>
+
+        {/* DIGITAL EKG */}
+        <section className="col-span-12 xl:col-span-8">
+          <Card
+            title="Digital EKG — Behavioral vs Clinical Intent"
+            subtitle="Top axis: Environmental/Behavioral · Bottom axis: Clinical (Hantavirus topic). Vertical marker flags lead-time gap."
+            glow="red"
+            icon={I("heart-pulse","w-4 h-4 text-red-400")}
+            right={
+              <div className="flex items-center gap-2">
+                <Pill color="amber">Behavioral lead {ekgGap.days}d</Pill>
+                <Pill color="cyan">N={national.length}d</Pill>
+              </div>
+            }
+          >
+            {/* Behavior */}
+            <div className="h-[230px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={national} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gEnv" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.55"/>
+                      <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.0"/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke="#1e293b" />
+                  <XAxis dataKey="Date" hide />
+                  <YAxis domain={[0,1]} tick={{ fill:"#94a3b8", fontSize:10 }} width={36}/>
+                  <Tooltip contentStyle={{ background:"#0f172a", border:"1px solid #334155", color:"#e2e8f0" }} />
+                  <Area type="monotone" dataKey="Environmental_Risk" stroke="#f59e0b" fill="url(#gEnv)" name="Environmental_Risk"/>
+                  <Line type="monotone" dataKey="Exposure_Behavior" stroke="#fb7185" dot={false} strokeWidth={2} name="Exposure_Behavior"/>
+                  <ReferenceLine x={ekgGap.bDate} stroke="#fb7185" strokeDasharray="3 3" label={{ value:"Behavior peak", fill:"#fb7185", fontSize:10, position:"insideTopLeft" }}/>
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+            {/* Clinical */}
+            <div className="h-[200px] mt-1">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={national} margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gClin" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#ef4444" stopOpacity="0.55"/>
+                      <stop offset="100%" stopColor="#ef4444" stopOpacity="0.0"/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke="#1e293b" />
+                  <XAxis dataKey="Date" tick={{ fill:"#94a3b8", fontSize:10 }} minTickGap={48}/>
+                  <YAxis domain={[0,1]} tick={{ fill:"#94a3b8", fontSize:10 }} width={36}/>
+                  <Tooltip contentStyle={{ background:"#0f172a", border:"1px solid #334155", color:"#e2e8f0" }} />
+                  <Area type="monotone" dataKey="Hantavirus_Topic" stroke="#ef4444" fill="url(#gClin)" name="Hantavirus_Topic"/>
+                  <ReferenceLine x={ekgGap.cDate} stroke="#ef4444" strokeDasharray="3 3" label={{ value:"Clinical peak", fill:"#ef4444", fontSize:10, position:"insideTopRight" }}/>
+                  <ReferenceArea x1={ekgGap.bDate} x2={ekgGap.cDate} fill="#ef4444" fillOpacity={0.08} stroke="none" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-2 text-[11px] text-slate-400">
+              Shaded interval = <span className="text-red-300">lead-time gap</span>: behavioral semantics ("cleaning shed", "mouse droppings") precede clinical search intent ("hantavirus symptoms") by ~{ekgGap.days} days.
+            </div>
+          </Card>
+        </section>
+
+        {/* Public Health Advisory */}
+        <aside className="col-span-12 xl:col-span-4 grid grid-cols-1 gap-4">
+          <Card
+            title="Public Health Advisory"
+            subtitle="Real-time risk synthesis"
+            glow={advisory.tone}
+            icon={I("siren","w-4 h-4 text-red-400")}
+          >
+            <div className={`rounded-xl p-4 border ${advisory.tone==='red' ? 'bg-red-500/10 border-red-500/40' : advisory.tone==='amber' ? 'bg-amber-500/10 border-amber-500/40' : 'bg-emerald-500/10 border-emerald-500/40'}`}>
+              <div className="flex items-center justify-between">
+                <span className="uppercase tracking-widest text-xs text-slate-300">Current Level</span>
+                <Pill color={advisory.tone}>{advisory.level}</Pill>
+              </div>
+              <div className="mt-2 text-sm text-slate-200">{advisory.note}</div>
+              <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
+                <div className="bg-slate-900/60 rounded-lg p-2 border border-slate-800">
+                  <div className="text-slate-400">Behavior P</div>
+                  <div className="mono text-slate-100">{natNow.Exposure_Behavior.toFixed(2)}</div>
+                </div>
+                <div className="bg-slate-900/60 rounded-lg p-2 border border-slate-800">
+                  <div className="text-slate-400">Clinical P</div>
+                  <div className="mono text-slate-100">{natNow.Hantavirus_Topic.toFixed(2)}</div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 text-xs text-slate-400 leading-relaxed">
+              Recommended action vector: target <span className="text-amber-300">"Safe Cleaning"</span> intervention via Nielsen DMA media-buy in high-velocity markets below.
+            </div>
+          </Card>
+
+          <Card
+            title="Anomalous Surge Tracker"
+            subtitle="DMAs that 'broke the silence' vs baseline"
+            glow="amber"
+            icon={I("zap","w-4 h-4 text-amber-400")}
+          >
+            <div className="max-h-[270px] overflow-auto scroll-thin pr-2">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-slate-500 uppercase tracking-widest">
+                    <th className="text-left py-1">DMA</th>
+                    <th className="text-right">P̄₇</th>
+                    <th className="text-right">Δ</th>
+                    <th className="text-right">Vel</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {surge.slice(0,12).map((s,i)=>(
+                    <tr key={s.code} className="border-t border-slate-800/60 hover:bg-slate-800/30">
+                      <td className="py-1.5">
+                        <div className="flex items-center gap-2">
+                          {s.breaksSilence && <span title="Broke baseline silence">{I("alert-triangle","w-3 h-3 text-red-400")}</span>}
+                          <span className="text-slate-200">{s.name}</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500">{s.region} · DMA {s.code}</div>
+                      </td>
+                      <td className="text-right mono text-slate-100">{s.P7.toFixed(2)}</td>
+                      <td className={`text-right mono ${s.delta>=0?'text-emerald-300':'text-rose-300'}`}>{s.delta>=0?'+':''}{s.delta.toFixed(2)}</td>
+                      <td className="text-right mono text-amber-300">{s.velocity>0?'+':''}{s.velocity}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </aside>
+
+        {/* Geospatial Heatmap */}
+        <section className="col-span-12 xl:col-span-8">
+          <Card
+            title="Geospatial Risk Heatmap — Western US"
+            subtitle="Symbol radius & color encode 7-day rolling probability per DMA. Biohazard ramp."
+            glow="red"
+            icon={I("globe-2","w-4 h-4 text-red-400")}
+            right={hover ? (
+              <Pill color="amber">{hover.DMA_Name} · P̄₇ {hover.P7.toFixed(2)}</Pill>
+            ) : <Pill color="slate">hover a DMA</Pill>}
+          >
+            <div className="h-[460px] rounded-xl overflow-hidden border border-slate-800 bg-slate-950/70">
+              <ProjMap data={todaySnap} onHover={setHover}/>
+            </div>
+          </Card>
+        </section>
+
+        {/* Leaderboard */}
+        <aside className="col-span-12 xl:col-span-4">
+          <Card
+            title="Top-10 DMA by Surge Velocity"
+            subtitle="Δ P̄₇ over 7d (× 100)"
+            glow="cyan"
+            icon={I("list-ordered","w-4 h-4 text-cyan-300")}
+          >
+            <div className="h-[460px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={surge.slice(0,10)} layout="vertical" margin={{ left: 10, right: 24 }}>
+                  <CartesianGrid stroke="#1e293b" horizontal={false} />
+                  <XAxis type="number" tick={{ fill:"#94a3b8", fontSize:10 }} />
+                  <YAxis dataKey="name" type="category" tick={{ fill:"#cbd5e1", fontSize:10 }} width={150}/>
+                  <Tooltip contentStyle={{ background:"#0f172a", border:"1px solid #334155", color:"#e2e8f0" }} formatter={(v)=> `${v}%`}/>
+                  <Bar dataKey="velocity" radius={[0,6,6,0]}>
+                    {surge.slice(0,10).map((s,i)=>(
+                      <Cell key={i} fill={s.velocity>20?"#ef4444": s.velocity>10?"#f59e0b":"#22d3ee"}/>
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </aside>
+
+        {/* Trifecta semantic chart */}
+        <section className="col-span-12">
+          <Card
+            title="Longitudinal Trend — Semantic Trifecta"
+            subtitle="Hantavirus_Topic (clinical) · Environmental_Risk · Exposure_Behavior — lead-lag visualization"
+            glow="amber"
+            icon={I("line-chart","w-4 h-4 text-amber-400")}
+          >
+            <div className="h-[320px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={national} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+                  <CartesianGrid stroke="#1e293b" />
+                  <XAxis dataKey="Date" tick={{ fill:"#94a3b8", fontSize:10 }} minTickGap={56}/>
+                  <YAxis domain={[0,1]} tick={{ fill:"#94a3b8", fontSize:10 }} />
+                  <Tooltip contentStyle={{ background:"#0f172a", border:"1px solid #334155", color:"#e2e8f0" }} />
+                  <Legend wrapperStyle={{ color:"#cbd5e1", fontSize:12 }}/>
+                  <Line type="monotone" dataKey="Hantavirus_Topic"   stroke="#ef4444" dot={false} strokeWidth={2}/>
+                  <Line type="monotone" dataKey="Environmental_Risk" stroke="#f59e0b" dot={false} strokeWidth={2}/>
+                  <Line type="monotone" dataKey="Exposure_Behavior"  stroke="#22d3ee" dot={false} strokeWidth={2}/>
+                  <Line type="monotone" dataKey="Precip_PriorYear"   stroke="#64748b" dot={false} strokeWidth={1} strokeDasharray="4 4"/>
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </section>
+
+        {/* Methodological note */}
+        <section className="col-span-12">
+          <Card
+            title="Methodological Note — Grouped Expression Methodology"
+            subtitle="Breaking the 'Rural Silence' imposed by k-anonymity"
+            glow="cyan"
+            icon={I("scroll-text","w-4 h-4 text-cyan-300")}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm leading-relaxed text-slate-300">
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">1. The k-anonymity Problem</div>
+                Google Health Trends' v1alpha endpoint suppresses query counts below threshold k, producing "Rural Silence" — zeros that mask true low-volume signal in DMAs like Casper-Riverton or Grand Junction.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">2. Grouped Expressions</div>
+                We submit semantically equivalent expression bundles per concept ("mouse droppings" + "cleaning shed" + "deer mouse nest" + "rodent infestation home") as a single probability query. The denominator pools low-volume terms into a single inferential unit, lifting them above k.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">3. Probability, Not Volume</div>
+                The metric is P(query ∈ HantavirusIntent | DMA, date). It conditions out general curiosity and population mass, yielding a behaviorally meaningful prior that supports cross-DMA comparison and rural recoverability.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">4. Trophic-Cascade Conditioning</div>
+                Signal is interpreted under the Reservoir-Host model: precipitation (t-12mo) → vegetation → Peromyscus density → human exposure semantics → clinical search intent. Filtering on Western US DMAs constrains inference to regions where the ecological prior holds.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">5. Nielsen DMA as the Action Layer</div>
+                DMA codes (vs counties/states) align surveillance with media-market geometry. Detected surges in DMA 790 (Albuquerque-Santa Fe) or 770 (Salt Lake City) directly map to local broadcast and social-media clusters for targeted "Safe Cleaning" messaging.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">6. From Lagging to Leading</div>
+                Traditional surveillance reports confirmed cases (lagging). E-BEWS pivots to behavioral probability (leading), exploiting the ~14-day gap between household-exposure semantics and clinical-symptom semantics — the actionable intervention window.
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-5 gap-3 text-[11px]">
+              {[
+                ["Source",     "Google Health Trends API v1alpha"],
+                ["Metric",     "P(query ∈ Hantavirus intent)"],
+                ["Resolution", "Nielsen DMA (n=41 Western US)"],
+                ["Privacy",    "Grouped Expressions defeat k-anon"],
+                ["Outcome",    "Predictive Semantic Defense"],
+              ].map(([k,v],i)=>(
+                <div key={i} className="bg-slate-900/60 border border-slate-800 rounded-lg p-2">
+                  <div className="text-slate-500 uppercase tracking-widest">{k}</div>
+                  <div className="text-slate-200 mono mt-1">{v}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </section>
+
+        <footer className="col-span-12 text-center text-[11px] text-slate-500 py-4">
+          E-BEWS · synthetic ecological pulses for demonstration · plug in <span className="mono">Hantavirus_DMA_Master_Merge.csv</span> by replacing <span className="mono">genTimeSeries()</span> / <span className="mono">genDMASeries()</span> with a CSV loader.
+        </footer>
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
