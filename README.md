@@ -31,7 +31,7 @@ See [docs/METHODOLOGY.md](docs/METHODOLOGY.md) for the full methodology.
 
 A static `index.html` is enough to run the dashboard. GitHub Pages serves it directly:
 
-> **https://<your-github-username>.github.io/ebews-usa-dashboard/**
+> **https://aidea1.github.io/hantavirus/**
 
 Or open `index.html` locally — no build, no dependencies, no Node.
 
@@ -84,7 +84,7 @@ ebews-usa-dashboard/
 ## Quick start
 
 ```bash
-git clone https://github.com/<your-github-username>/ebews-usa-dashboard.git
+git clone https://github.com/aidea1/hantavirus.git
 cd ebews-usa-dashboard
 # Just open it. No build step.
 xdg-open index.html        # Linux
@@ -134,7 +134,8 @@ A small helper to re-embed is on the to-do list (see [issues](../../issues)).
 
 If you use this dashboard, see [CITATION.cff](CITATION.cff) or:
 
-> Akshaya. *E-BEWS USA — Hantavirus Digital Epidemiology Command Center.* v1.0.0, 2026. https://github.com/<your-github-username>/ebews-usa-dashboard
+> Akshaya. *E-BEWS USA — Hantavirus Digital Epidemiology Command Center.* v1.0.0, 2026. > https://aidea1.github.io/hantavirus/
+
 
 ---
 
