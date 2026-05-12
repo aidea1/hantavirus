@@ -1,0 +1,1468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>E-BEWS USA · Hantavirus Digital Epidemiology Command Center</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js" crossorigin></script>
+<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js" crossorigin></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root { color-scheme: dark; }
+  html,body { background:#020617; color:#e2e8f0; font-family: ui-sans-serif, system-ui, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  .glow-red    { box-shadow: 0 0 24px rgba(239,68,68,.38), inset 0 0 18px rgba(239,68,68,.10); border-color: rgba(239,68,68,.55); }
+  .glow-amber  { box-shadow: 0 0 22px rgba(245,158,11,.32), inset 0 0 14px rgba(245,158,11,.09); border-color: rgba(245,158,11,.50); }
+  .glow-em     { box-shadow: 0 0 18px rgba(16,185,129,.25), inset 0 0 12px rgba(16,185,129,.06); border-color: rgba(16,185,129,.45); }
+  .glow-cyan   { box-shadow: 0 0 18px rgba(34,211,238,.25), inset 0 0 12px rgba(34,211,238,.07); border-color: rgba(34,211,238,.45); }
+  .glow-violet { box-shadow: 0 0 18px rgba(167,139,250,.22), inset 0 0 12px rgba(167,139,250,.07); border-color: rgba(167,139,250,.45); }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(148,163,184,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148,163,184,.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .pulse-dot::after{
+    content:""; display:inline-block; width:8px; height:8px; border-radius:9999px;
+    background:#ef4444; margin-left:8px;
+    box-shadow:0 0 0 0 rgba(239,68,68,.6); animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse {
+    0%{box-shadow:0 0 0 0 rgba(239,68,68,.55);}
+    70%{box-shadow:0 0 0 12px rgba(239,68,68,0);}
+    100%{box-shadow:0 0 0 0 rgba(239,68,68,0);}
+  }
+  @keyframes breathe {
+    0%,100%{ opacity:.55; r: var(--rmin, 8); }
+    50%   { opacity:.10; r: var(--rmax, 18); }
+  }
+  @keyframes sweepDash { 0%{stroke-dashoffset:0;} 100%{stroke-dashoffset:-200;} }
+  @keyframes tickerMove { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+  .breathe { animation: breathe 1.6s ease-in-out infinite; }
+  .sweep   { stroke-dasharray: 6 6; animation: sweepDash 2.4s linear infinite; }
+  .ticker-track { display:inline-flex; gap:2.2rem; white-space:nowrap; animation: tickerMove 60s linear infinite; }
+  .ticker-track:hover { animation-play-state: paused; }
+  .num-anim { transition: color .25s ease; }
+  .scroll-thin::-webkit-scrollbar{ width:6px; height:6px;}
+  .scroll-thin::-webkit-scrollbar-thumb{ background:#1e293b; border-radius:3px;}
+  .src-card { transition: transform .12s ease, box-shadow .12s ease; }
+  .src-card:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.5); }
+  .heat-cell { stroke: #020617; stroke-width: 1; transition: opacity .25s ease, fill .25s ease; }
+  .heat-cell-active { stroke: #fde68a; stroke-width: 1.5; filter: drop-shadow(0 0 4px rgba(253,230,138,.6)); }
+  .marker-circle { transition: r .35s ease, fill .35s ease, stroke-opacity .35s ease; }
+  .scrollx { overflow-x: auto; }
+  .btn-ghost { background: rgba(15,23,42,.6); border: 1px solid #334155; color:#cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 11px; }
+  .btn-ghost:hover { background: rgba(30,41,59,.8); color:#fff; }
+  .btn-ghost[data-active="true"] { color:#f59e0b; border-color: rgba(245,158,11,.5); background: rgba(245,158,11,.1); }
+  .scrubber { -webkit-appearance:none; appearance:none; height:6px; background: linear-gradient(90deg,#0ea5e9,#ef4444); border-radius: 9999px; }
+  .scrubber::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:14px; height:14px; border-radius:9999px; background:#fde68a; box-shadow: 0 0 8px rgba(253,230,138,.8); cursor: pointer; }
+  .scrubber::-moz-range-thumb { width:14px; height:14px; border-radius:9999px; background:#fde68a; box-shadow: 0 0 8px rgba(253,230,138,.8); cursor: pointer; }
+</style>
+</head>
+<body class="min-h-screen">
+<div id="root"></div>
+
+<script type="text/babel" data-presets="env,react">
+const { useMemo, useState, useEffect, useRef, useCallback } = React;
+const {
+  ResponsiveContainer, ComposedChart, LineChart, AreaChart, Line, Area, XAxis, YAxis,
+  CartesianGrid, Tooltip, Legend, ReferenceLine, ReferenceArea, BarChart, Bar, Cell, ScatterChart, Scatter
+} = Recharts;
+
+/* =============================================================================
+   E-BEWS USA — Hantavirus Digital Epidemiology Command Center
+   Data source: Hantavirus_DMA_Master_Merge.csv (Google Health Trends API,
+                v1alpha · Western US DMAs · 2026-05-01 → 2026-05-10)
+   Live overlay: ArcGIS FeatureServer (Tracking_Hantavirus_2026/1)
+   Methodology: Grouped Expression queries to defeat k-anonymity in rural DMAs.
+============================================================================= */
+
+// ---------- DMA registry: maps truncated CSV names → canonical name + geo ----------
+// The merging step split DMA names on whitespace. We restore canonical labels.
+// The "San" key appears twice in the CSV (San Diego + San Francisco-Oakland-San Jose);
+// row order in the merge places San Diego first, San Francisco second per date.
+const DMA_LOOKUP = {
+  "Albuquerque-Santa":                  { name:"Albuquerque-Santa Fe NM",          code:790, lat:35.08, lng:-106.65, region:"Four Corners" },
+  "Amarillo":                           { name:"Amarillo TX",                      code:634, lat:35.22, lng:-101.83, region:"Plains" },
+  "Bakersfield":                        { name:"Bakersfield CA",                   code:800, lat:35.37, lng:-119.02, region:"Pacific SW" },
+  "Bend":                               { name:"Bend OR",                          code:821, lat:44.06, lng:-121.31, region:"Pacific NW" },
+  "Billings":                           { name:"Billings MT",                      code:756, lat:45.79, lng:-108.55, region:"N. Rockies" },
+  "Boise":                              { name:"Boise ID",                         code:757, lat:43.61, lng:-116.20, region:"N. Rockies" },
+  "Butte-Bozeman":                      { name:"Butte-Bozeman MT",                 code:754, lat:45.68, lng:-111.04, region:"N. Rockies" },
+  "Casper-Riverton":                    { name:"Casper-Riverton WY",               code:767, lat:42.85, lng:-106.32, region:"N. Rockies" },
+  "Cheyenne":                           { name:"Cheyenne WY-Scottsbluff NE",       code:759, lat:41.14, lng:-104.82, region:"N. Rockies" },
+  "Chico-Redding":                      { name:"Chico-Redding CA",                 code:868, lat:40.59, lng:-122.39, region:"Pacific NW" },
+  "Colorado":                           { name:"Colorado Springs-Pueblo CO",       code:752, lat:38.83, lng:-104.82, region:"Four Corners" },
+  "Denver":                             { name:"Denver CO",                        code:751, lat:39.74, lng:-104.99, region:"Four Corners" },
+  "El":                                 { name:"El Paso TX",                       code:765, lat:31.76, lng:-106.49, region:"Four Corners" },
+  "Eugene":                             { name:"Eugene OR",                        code:801, lat:44.05, lng:-123.09, region:"Pacific NW" },
+  "Fargo-Valley":                       { name:"Fargo-Valley City ND",             code:724, lat:46.88, lng:-96.79,  region:"Plains" },
+  "Fresno-Visalia":                     { name:"Fresno-Visalia CA",                code:866, lat:36.74, lng:-119.78, region:"Pacific SW" },
+  "Grand":                              { name:"Grand Junction-Montrose CO",       code:773, lat:39.06, lng:-108.55, region:"Four Corners" },
+  "Great":                              { name:"Great Falls MT",                   code:755, lat:47.49, lng:-111.30, region:"N. Rockies" },
+  "Idaho":                              { name:"Idaho Falls-Pocatello ID",         code:758, lat:43.49, lng:-112.04, region:"N. Rockies" },
+  "Las":                                { name:"Las Vegas NV",                     code:839, lat:36.17, lng:-115.14, region:"Pacific SW" },
+  "Los":                                { name:"Los Angeles CA",                   code:803, lat:34.05, lng:-118.24, region:"Pacific SW" },
+  "Lubbock":                            { name:"Lubbock TX",                       code:651, lat:33.58, lng:-101.86, region:"Plains" },
+  "Medford-Klamath":                    { name:"Medford-Klamath Falls OR",         code:813, lat:42.33, lng:-122.86, region:"Pacific NW" },
+  "Minot-Bismarck-Dickinson(Williston)":{ name:"Minot-Bismarck-Dickinson ND",      code:687, lat:46.81, lng:-100.78, region:"Plains" },
+  "Missoula":                           { name:"Missoula MT",                      code:762, lat:46.87, lng:-113.99, region:"N. Rockies" },
+  "Odessa-Midland":                     { name:"Odessa-Midland TX",                code:633, lat:31.84, lng:-102.36, region:"Plains" },
+  "Phoenix":                            { name:"Phoenix AZ",                       code:753, lat:33.45, lng:-112.07, region:"Four Corners" },
+  "Portland":                           { name:"Portland OR",                      code:820, lat:45.51, lng:-122.68, region:"Pacific NW" },
+  "Rapid":                              { name:"Rapid City SD",                    code:764, lat:44.08, lng:-103.23, region:"N. Rockies" },
+  "Reno":                               { name:"Reno NV",                          code:811, lat:39.53, lng:-119.81, region:"Pacific SW" },
+  "Sacramento-Stockton-Modesto":        { name:"Sacramento-Stockton-Modesto CA",   code:862, lat:38.58, lng:-121.49, region:"Pacific SW" },
+  "Salt":                               { name:"Salt Lake City UT",                code:770, lat:40.76, lng:-111.89, region:"Four Corners" },
+  // two "San" tokens — row 1 = San Diego, row 2 = San Francisco-Oakland-San Jose
+  "San__1":                             { name:"San Diego CA",                     code:825, lat:32.72, lng:-117.16, region:"Pacific SW" },
+  "San__2":                             { name:"San Francisco-Oakland-San Jose CA",code:807, lat:37.77, lng:-122.42, region:"Pacific SW" },
+  "Seattle-Tacoma":                     { name:"Seattle-Tacoma WA",                code:819, lat:47.61, lng:-122.33, region:"Pacific NW" },
+  "Sioux":                              { name:"Sioux Falls (Mitchell) SD",        code:725, lat:43.55, lng:-96.73,  region:"Plains" },
+  "Spokane":                            { name:"Spokane WA",                       code:881, lat:47.66, lng:-117.43, region:"Pacific NW" },
+  "Tucson":                             { name:"Tucson (Sierra Vista) AZ",         code:789, lat:32.22, lng:-110.93, region:"Four Corners" },
+  "Twin":                               { name:"Twin Falls ID",                    code:760, lat:42.56, lng:-114.46, region:"N. Rockies" },
+  "Yakima-Pasco-Richland-Kennewick":    { name:"Yakima-Pasco-Richland-Kennewick WA",code:810,lat:46.60, lng:-120.51, region:"Pacific NW" },
+  "Yuma":                               { name:"Yuma AZ-El Centro CA",             code:771, lat:32.69, lng:-114.63, region:"Four Corners" },
+};
+
+// ------------------- Inline CSV (verbatim from Hantavirus_DMA_Master_Merge.csv) --
+const CSV = `Date,SearchInterest,DMA,Term
+2026-05-01,172.46413842693283,Albuquerque-Santa,hantavirus
+2026-05-01,0.0,Amarillo,hantavirus
+2026-05-01,0.0,Bakersfield,hantavirus
+2026-05-01,0.0,Bend,hantavirus
+2026-05-01,0.0,Billings,hantavirus
+2026-05-01,0.0,Boise,hantavirus
+2026-05-01,0.0,Butte-Bozeman,hantavirus
+2026-05-01,0.0,Casper-Riverton,hantavirus
+2026-05-01,0.0,Cheyenne,hantavirus
+2026-05-01,0.0,Chico-Redding,hantavirus
+2026-05-01,0.0,Colorado,hantavirus
+2026-05-01,50.65147924942691,Denver,hantavirus
+2026-05-01,0.0,El,hantavirus
+2026-05-01,0.0,Eugene,hantavirus
+2026-05-01,0.0,Fargo-Valley,hantavirus
+2026-05-01,0.0,Fresno-Visalia,hantavirus
+2026-05-01,0.0,Grand,hantavirus
+2026-05-01,0.0,Great,hantavirus
+2026-05-01,0.0,Idaho,hantavirus
+2026-05-01,0.0,Las,hantavirus
+2026-05-01,30.371869739879077,Los,hantavirus
+2026-05-01,0.0,Lubbock,hantavirus
+2026-05-01,0.0,Medford-Klamath,hantavirus
+2026-05-01,0.0,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-01,0.0,Missoula,hantavirus
+2026-05-01,0.0,Odessa-Midland,hantavirus
+2026-05-01,37.22715541125972,Phoenix,hantavirus
+2026-05-01,59.22271738494221,Portland,hantavirus
+2026-05-01,0.0,Rapid,hantavirus
+2026-05-01,0.0,Reno,hantavirus
+2026-05-01,0.0,Sacramento-Stockton-Modesto,hantavirus
+2026-05-01,0.0,Salt,hantavirus
+2026-05-01,0.0,San,hantavirus
+2026-05-01,35.58757944035054,San,hantavirus
+2026-05-01,0.0,Seattle-Tacoma,hantavirus
+2026-05-01,0.0,Sioux,hantavirus
+2026-05-01,0.0,Spokane,hantavirus
+2026-05-01,0.0,Tucson,hantavirus
+2026-05-01,0.0,Twin,hantavirus
+2026-05-01,0.0,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-01,0.0,Yuma,hantavirus
+2026-05-02,265.1150168146013,Albuquerque-Santa,hantavirus
+2026-05-02,0.0,Amarillo,hantavirus
+2026-05-02,0.0,Bakersfield,hantavirus
+2026-05-02,0.0,Bend,hantavirus
+2026-05-02,0.0,Billings,hantavirus
+2026-05-02,0.0,Boise,hantavirus
+2026-05-02,0.0,Butte-Bozeman,hantavirus
+2026-05-02,0.0,Casper-Riverton,hantavirus
+2026-05-02,0.0,Cheyenne,hantavirus
+2026-05-02,0.0,Chico-Redding,hantavirus
+2026-05-02,0.0,Colorado,hantavirus
+2026-05-02,25.545811570292837,Denver,hantavirus
+2026-05-02,0.0,El,hantavirus
+2026-05-02,0.0,Eugene,hantavirus
+2026-05-02,0.0,Fargo-Valley,hantavirus
+2026-05-02,190.347053809968,Fresno-Visalia,hantavirus
+2026-05-02,0.0,Grand,hantavirus
+2026-05-02,0.0,Great,hantavirus
+2026-05-02,0.0,Idaho,hantavirus
+2026-05-02,0.0,Las,hantavirus
+2026-05-02,24.85326931317063,Los,hantavirus
+2026-05-02,0.0,Lubbock,hantavirus
+2026-05-02,0.0,Medford-Klamath,hantavirus
+2026-05-02,0.0,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-02,0.0,Missoula,hantavirus
+2026-05-02,0.0,Odessa-Midland,hantavirus
+2026-05-02,0.0,Phoenix,hantavirus
+2026-05-02,102.70550875188424,Portland,hantavirus
+2026-05-02,0.0,Rapid,hantavirus
+2026-05-02,0.0,Reno,hantavirus
+2026-05-02,81.25933811544174,Sacramento-Stockton-Modesto,hantavirus
+2026-05-02,0.0,Salt,hantavirus
+2026-05-02,0.0,San,hantavirus
+2026-05-02,68.12800618291018,San,hantavirus
+2026-05-02,37.08583370798132,Seattle-Tacoma,hantavirus
+2026-05-02,0.0,Sioux,hantavirus
+2026-05-02,0.0,Spokane,hantavirus
+2026-05-02,0.0,Tucson,hantavirus
+2026-05-02,0.0,Twin,hantavirus
+2026-05-02,0.0,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-02,0.0,Yuma,hantavirus
+2026-05-03,1762.9366713996276,Albuquerque-Santa,hantavirus
+2026-05-03,1951.0772887507276,Amarillo,hantavirus
+2026-05-03,966.57064977126,Bakersfield,hantavirus
+2026-05-03,1318.6763131929697,Bend,hantavirus
+2026-05-03,2775.0742771014,Billings,hantavirus
+2026-05-03,2263.74552076282,Boise,hantavirus
+2026-05-03,2397.689325874592,Butte-Bozeman,hantavirus
+2026-05-03,0.0,Casper-Riverton,hantavirus
+2026-05-03,0.0,Cheyenne,hantavirus
+2026-05-03,1913.4705690336696,Chico-Redding,hantavirus
+2026-05-03,1525.1408198410036,Colorado,hantavirus
+2026-05-03,1413.0538964057357,Denver,hantavirus
+2026-05-03,977.8286633281826,El,hantavirus
+2026-05-03,2268.614093176492,Eugene,hantavirus
+2026-05-03,1215.8038055428551,Fargo-Valley,hantavirus
+2026-05-03,964.5572830221043,Fresno-Visalia,hantavirus
+2026-05-03,0.0,Grand,hantavirus
+2026-05-03,0.0,Great,hantavirus
+2026-05-03,1005.148627559188,Idaho,hantavirus
+2026-05-03,1657.3261860433977,Las,hantavirus
+2026-05-03,1801.301563314037,Los,hantavirus
+2026-05-03,1264.380250227119,Lubbock,hantavirus
+2026-05-03,1088.0448668549282,Medford-Klamath,hantavirus
+2026-05-03,0.0,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-03,0.0,Missoula,hantavirus
+2026-05-03,1449.6193031844778,Odessa-Midland,hantavirus
+2026-05-03,1582.8268091300936,Phoenix,hantavirus
+2026-05-03,2649.805899931381,Portland,hantavirus
+2026-05-03,0.0,Rapid,hantavirus
+2026-05-03,1758.254977483724,Reno,hantavirus
+2026-05-03,1616.681695620545,Sacramento-Stockton-Modesto,hantavirus
+2026-05-03,1681.635865126107,Salt,hantavirus
+2026-05-03,2257.289995607785,San,hantavirus
+2026-05-03,2926.3876778228764,San,hantavirus
+2026-05-03,2459.9290489936934,Seattle-Tacoma,hantavirus
+2026-05-03,1241.2076573781758,Sioux,hantavirus
+2026-05-03,1506.1134258591535,Spokane,hantavirus
+2026-05-03,2123.9811359681107,Tucson,hantavirus
+2026-05-03,1966.0717556924224,Twin,hantavirus
+2026-05-03,1334.01533258551,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-03,840.4681086474906,Yuma,hantavirus
+2026-05-04,9006.034416126939,Albuquerque-Santa,hantavirus
+2026-05-04,10928.26435797746,Amarillo,hantavirus
+2026-05-04,7650.813998242161,Bakersfield,hantavirus
+2026-05-04,9271.833202615406,Bend,hantavirus
+2026-05-04,14482.611299523543,Billings,hantavirus
+2026-05-04,10135.778481574403,Boise,hantavirus
+2026-05-04,9855.24021884446,Butte-Bozeman,hantavirus
+2026-05-04,6393.058296471468,Casper-Riverton,hantavirus
+2026-05-04,3536.821755686379,Cheyenne,hantavirus
+2026-05-04,9617.07772488106,Chico-Redding,hantavirus
+2026-05-04,10183.94071601598,Colorado,hantavirus
+2026-05-04,7054.502015311024,Denver,hantavirus
+2026-05-04,8028.5308057895745,El,hantavirus
+2026-05-04,10561.491123828182,Eugene,hantavirus
+2026-05-04,9380.98851094231,Fargo-Valley,hantavirus
+2026-05-04,7661.106084410615,Fresno-Visalia,hantavirus
+2026-05-04,8190.082791072391,Grand,hantavirus
+2026-05-04,7264.793751600513,Great,hantavirus
+2026-05-04,7812.613100036611,Idaho,hantavirus
+2026-05-04,9780.110842024656,Las,hantavirus
+2026-05-04,10507.631481002452,Los,hantavirus
+2026-05-04,9442.999605127468,Lubbock,hantavirus
+2026-05-04,8950.493090400656,Medford-Klamath,hantavirus
+2026-05-04,8489.811795234327,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-04,7089.187757434866,Missoula,hantavirus
+2026-05-04,10186.06401788779,Odessa-Midland,hantavirus
+2026-05-04,11860.310386435158,Phoenix,hantavirus
+2026-05-04,10972.830901016345,Portland,hantavirus
+2026-05-04,10012.842985701353,Rapid,hantavirus
+2026-05-04,8462.926872756527,Reno,hantavirus
+2026-05-04,9358.361023549827,Sacramento-Stockton-Modesto,hantavirus
+2026-05-04,9362.921936892,Salt,hantavirus
+2026-05-04,11590.564609398716,San,hantavirus
+2026-05-04,10666.703396015904,San,hantavirus
+2026-05-04,11898.830057255363,Seattle-Tacoma,hantavirus
+2026-05-04,8902.240397022382,Sioux,hantavirus
+2026-05-04,9467.01669461523,Spokane,hantavirus
+2026-05-04,10973.978181877656,Tucson,hantavirus
+2026-05-04,6295.328919429545,Twin,hantavirus
+2026-05-04,6955.697843425291,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-04,7296.495482282885,Yuma,hantavirus
+2026-05-05,10564.440000674198,Albuquerque-Santa,hantavirus
+2026-05-05,14600.703746227611,Amarillo,hantavirus
+2026-05-05,11825.454415964285,Bakersfield,hantavirus
+2026-05-05,12762.288980522306,Bend,hantavirus
+2026-05-05,15716.19560437397,Billings,hantavirus
+2026-05-05,12092.110954828497,Boise,hantavirus
+2026-05-05,11160.907433419205,Butte-Bozeman,hantavirus
+2026-05-05,11495.800074423,Casper-Riverton,hantavirus
+2026-05-05,5879.009910737139,Cheyenne,hantavirus
+2026-05-05,10961.601102877745,Chico-Redding,hantavirus
+2026-05-05,14692.86436228527,Colorado,hantavirus
+2026-05-05,8509.445460123448,Denver,hantavirus
+2026-05-05,10710.138104090887,El,hantavirus
+2026-05-05,12246.099571835592,Eugene,hantavirus
+2026-05-05,12038.031847370648,Fargo-Valley,hantavirus
+2026-05-05,10843.817660818091,Fresno-Visalia,hantavirus
+2026-05-05,9281.166248417574,Grand,hantavirus
+2026-05-05,10552.239865537418,Great,hantavirus
+2026-05-05,9036.36950679802,Idaho,hantavirus
+2026-05-05,13180.978669587634,Las,hantavirus
+2026-05-05,12803.52027550021,Los,hantavirus
+2026-05-05,11843.29006084334,Lubbock,hantavirus
+2026-05-05,12399.488174098162,Medford-Klamath,hantavirus
+2026-05-05,10449.998906305897,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-05,10266.664518447546,Missoula,hantavirus
+2026-05-05,11791.486343101284,Odessa-Midland,hantavirus
+2026-05-05,13180.25524424135,Phoenix,hantavirus
+2026-05-05,13869.49590497933,Portland,hantavirus
+2026-05-05,13021.47588178455,Rapid,hantavirus
+2026-05-05,10385.996425300937,Reno,hantavirus
+2026-05-05,11935.932873470849,Sacramento-Stockton-Modesto,hantavirus
+2026-05-05,11738.56915657996,Salt,hantavirus
+2026-05-05,13849.597241674672,San,hantavirus
+2026-05-05,12116.717988834786,San,hantavirus
+2026-05-05,13623.44698881115,Seattle-Tacoma,hantavirus
+2026-05-05,12346.320397788148,Sioux,hantavirus
+2026-05-05,11360.85942392683,Spokane,hantavirus
+2026-05-05,12706.008582938157,Tucson,hantavirus
+2026-05-05,10740.66508520869,Twin,hantavirus
+2026-05-05,10542.183440428458,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-05,11381.100750992558,Yuma,hantavirus
+2026-05-06,20023.17697720674,Albuquerque-Santa,hantavirus
+2026-05-06,30140.366986956426,Amarillo,hantavirus
+2026-05-06,22409.822774199256,Bakersfield,hantavirus
+2026-05-06,21684.18979122485,Bend,hantavirus
+2026-05-06,31903.41559467045,Billings,hantavirus
+2026-05-06,23319.497601612657,Boise,hantavirus
+2026-05-06,23680.46318677027,Butte-Bozeman,hantavirus
+2026-05-06,22500.05001579489,Casper-Riverton,hantavirus
+2026-05-06,10052.833630728346,Cheyenne,hantavirus
+2026-05-06,21139.54377257644,Chico-Redding,hantavirus
+2026-05-06,25434.73639828457,Colorado,hantavirus
+2026-05-06,16175.05105778795,Denver,hantavirus
+2026-05-06,22625.63128165109,El,hantavirus
+2026-05-06,26004.642223820505,Eugene,hantavirus
+2026-05-06,26943.461579014507,Fargo-Valley,hantavirus
+2026-05-06,20655.27869108426,Fresno-Visalia,hantavirus
+2026-05-06,18993.651848053825,Grand,hantavirus
+2026-05-06,20959.15317414681,Great,hantavirus
+2026-05-06,18852.24335845922,Idaho,hantavirus
+2026-05-06,23329.48645365413,Las,hantavirus
+2026-05-06,23209.47781315222,Los,hantavirus
+2026-05-06,29623.05353903639,Lubbock,hantavirus
+2026-05-06,21467.09159840341,Medford-Klamath,hantavirus
+2026-05-06,21570.65831323812,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-06,17426.508192763446,Missoula,hantavirus
+2026-05-06,25807.524900184937,Odessa-Midland,hantavirus
+2026-05-06,24381.9371180491,Phoenix,hantavirus
+2026-05-06,25673.75874191812,Portland,hantavirus
+2026-05-06,22275.668273300707,Rapid,hantavirus
+2026-05-06,20602.45568994713,Reno,hantavirus
+2026-05-06,22305.82011739832,Sacramento-Stockton-Modesto,hantavirus
+2026-05-06,22891.70496170184,Salt,hantavirus
+2026-05-06,25840.22705838541,San,hantavirus
+2026-05-06,22144.69123123844,San,hantavirus
+2026-05-06,25835.52195941892,Seattle-Tacoma,hantavirus
+2026-05-06,26315.688143545056,Sioux,hantavirus
+2026-05-06,22857.27934176544,Spokane,hantavirus
+2026-05-06,24938.43962636599,Tucson,hantavirus
+2026-05-06,16745.39795054185,Twin,hantavirus
+2026-05-06,22028.47423269596,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-06,21633.245078318865,Yuma,hantavirus
+2026-05-07,43817.5691622519,Albuquerque-Santa,hantavirus
+2026-05-07,55484.3473733168,Amarillo,hantavirus
+2026-05-07,49671.30450012896,Bakersfield,hantavirus
+2026-05-07,52446.45455171123,Bend,hantavirus
+2026-05-07,54279.09972607299,Billings,hantavirus
+2026-05-07,47966.717166548,Boise,hantavirus
+2026-05-07,51326.456131373554,Butte-Bozeman,hantavirus
+2026-05-07,38289.60127739328,Casper-Riverton,hantavirus
+2026-05-07,18717.307119826568,Cheyenne,hantavirus
+2026-05-07,49720.24464076514,Chico-Redding,hantavirus
+2026-05-07,52823.97780178742,Colorado,hantavirus
+2026-05-07,33661.86677983814,Denver,hantavirus
+2026-05-07,53274.497218655175,El,hantavirus
+2026-05-07,55311.00913603616,Eugene,hantavirus
+2026-05-07,48318.96821446524,Fargo-Valley,hantavirus
+2026-05-07,50658.84638575907,Fresno-Visalia,hantavirus
+2026-05-07,42059.09846616242,Grand,hantavirus
+2026-05-07,42556.11106560039,Great,hantavirus
+2026-05-07,44587.562895873256,Idaho,hantavirus
+2026-05-07,50726.13478473391,Las,hantavirus
+2026-05-07,52313.17966139688,Los,hantavirus
+2026-05-07,66391.05927193938,Lubbock,hantavirus
+2026-05-07,47309.28885157185,Medford-Klamath,hantavirus
+2026-05-07,47638.319551844994,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-07,46784.02357570467,Missoula,hantavirus
+2026-05-07,51026.60513766377,Odessa-Midland,hantavirus
+2026-05-07,65699.76826936123,Phoenix,hantavirus
+2026-05-07,52747.731014600926,Portland,hantavirus
+2026-05-07,46913.81803590885,Rapid,hantavirus
+2026-05-07,48754.82002886512,Reno,hantavirus
+2026-05-07,49344.92049316814,Sacramento-Stockton-Modesto,hantavirus
+2026-05-07,49618.33671281209,Salt,hantavirus
+2026-05-07,58706.91667657632,San,hantavirus
+2026-05-07,51034.13691312783,San,hantavirus
+2026-05-07,51238.30846042457,Seattle-Tacoma,hantavirus
+2026-05-07,50164.16071717016,Sioux,hantavirus
+2026-05-07,49803.39932829744,Spokane,hantavirus
+2026-05-07,62328.32785643906,Tucson,hantavirus
+2026-05-07,40855.0756367321,Twin,hantavirus
+2026-05-07,50029.593380206425,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-07,53446.983038131024,Yuma,hantavirus
+2026-05-08,42312.813864234464,Albuquerque-Santa,hantavirus
+2026-05-08,48886.006596507286,Amarillo,hantavirus
+2026-05-08,50102.84935849159,Bakersfield,hantavirus
+2026-05-08,57382.73127515333,Bend,hantavirus
+2026-05-08,47116.957286133584,Billings,hantavirus
+2026-05-08,48071.82684983543,Boise,hantavirus
+2026-05-08,45947.043212984805,Butte-Bozeman,hantavirus
+2026-05-08,47940.49937037041,Casper-Riverton,hantavirus
+2026-05-08,20228.94891070725,Cheyenne,hantavirus
+2026-05-08,45580.45880575382,Chico-Redding,hantavirus
+2026-05-08,49181.92025901561,Colorado,hantavirus
+2026-05-08,28354.282139728453,Denver,hantavirus
+2026-05-08,47681.83282698471,El,hantavirus
+2026-05-08,49440.16987286997,Eugene,hantavirus
+2026-05-08,46134.038225988574,Fargo-Valley,hantavirus
+2026-05-08,51164.80369413994,Fresno-Visalia,hantavirus
+2026-05-08,38314.079795400445,Grand,hantavirus
+2026-05-08,41816.839387186046,Great,hantavirus
+2026-05-08,45763.23992213898,Idaho,hantavirus
+2026-05-08,47140.391705816415,Las,hantavirus
+2026-05-08,47888.42043401375,Los,hantavirus
+2026-05-08,49054.22099578388,Lubbock,hantavirus
+2026-05-08,46168.44587578271,Medford-Klamath,hantavirus
+2026-05-08,48303.12744620298,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-08,43201.81852234736,Missoula,hantavirus
+2026-05-08,47283.13308129608,Odessa-Midland,hantavirus
+2026-05-08,57510.36169216408,Phoenix,hantavirus
+2026-05-08,49744.79918484622,Portland,hantavirus
+2026-05-08,46549.5703501246,Rapid,hantavirus
+2026-05-08,50244.68223398912,Reno,hantavirus
+2026-05-08,47406.697447571605,Sacramento-Stockton-Modesto,hantavirus
+2026-05-08,45760.15040073359,Salt,hantavirus
+2026-05-08,49523.56864371058,San,hantavirus
+2026-05-08,46539.058223699496,San,hantavirus
+2026-05-08,47832.715608038176,Seattle-Tacoma,hantavirus
+2026-05-08,47124.34767164283,Sioux,hantavirus
+2026-05-08,44844.41167653797,Spokane,hantavirus
+2026-05-08,55427.28890929831,Tucson,hantavirus
+2026-05-08,42690.90394548137,Twin,hantavirus
+2026-05-08,45593.73924175326,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-08,54616.13900493199,Yuma,hantavirus
+2026-05-09,27314.056873346213,Albuquerque-Santa,hantavirus
+2026-05-09,30203.174724292985,Amarillo,hantavirus
+2026-05-09,32900.16118923921,Bakersfield,hantavirus
+2026-05-09,32404.94857832632,Bend,hantavirus
+2026-05-09,29496.95003145788,Billings,hantavirus
+2026-05-09,29117.013805153536,Boise,hantavirus
+2026-05-09,29311.00311870507,Butte-Bozeman,hantavirus
+2026-05-09,28084.86300834864,Casper-Riverton,hantavirus
+2026-05-09,15575.132468718855,Cheyenne,hantavirus
+2026-05-09,26088.191818343224,Chico-Redding,hantavirus
+2026-05-09,33858.07764942458,Colorado,hantavirus
+2026-05-09,18259.01225894984,Denver,hantavirus
+2026-05-09,30683.546623904203,El,hantavirus
+2026-05-09,31818.671148575904,Eugene,hantavirus
+2026-05-09,27037.47897975404,Fargo-Valley,hantavirus
+2026-05-09,42107.69265923118,Fresno-Visalia,hantavirus
+2026-05-09,25294.81743892235,Grand,hantavirus
+2026-05-09,26587.02181794996,Great,hantavirus
+2026-05-09,29675.904448024605,Idaho,hantavirus
+2026-05-09,28795.750995003204,Las,hantavirus
+2026-05-09,29396.318086277428,Los,hantavirus
+2026-05-09,28703.403814698137,Lubbock,hantavirus
+2026-05-09,31169.098894863928,Medford-Klamath,hantavirus
+2026-05-09,31937.2407813658,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-09,28540.39813913052,Missoula,hantavirus
+2026-05-09,26575.01614187354,Odessa-Midland,hantavirus
+2026-05-09,33168.26254940411,Phoenix,hantavirus
+2026-05-09,31390.235955634143,Portland,hantavirus
+2026-05-09,35442.79495298409,Rapid,hantavirus
+2026-05-09,34045.52912354478,Reno,hantavirus
+2026-05-09,30018.20899601197,Sacramento-Stockton-Modesto,hantavirus
+2026-05-09,34415.91999669213,Salt,hantavirus
+2026-05-09,31132.858912448934,San,hantavirus
+2026-05-09,29901.66621991299,San,hantavirus
+2026-05-09,30340.485165867125,Seattle-Tacoma,hantavirus
+2026-05-09,33784.838737794824,Sioux,hantavirus
+2026-05-09,29575.05246397039,Spokane,hantavirus
+2026-05-09,33611.98099041126,Tucson,hantavirus
+2026-05-09,28456.3123707534,Twin,hantavirus
+2026-05-09,28559.031386671977,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-09,29991.40396866592,Yuma,hantavirus
+2026-05-10,19843.786204511303,Albuquerque-Santa,hantavirus
+2026-05-10,20378.03487273545,Amarillo,hantavirus
+2026-05-10,24340.48427901362,Bakersfield,hantavirus
+2026-05-10,25263.013325253967,Bend,hantavirus
+2026-05-10,22404.756521353145,Billings,hantavirus
+2026-05-10,21642.302644730684,Boise,hantavirus
+2026-05-10,23507.84603410689,Butte-Bozeman,hantavirus
+2026-05-10,21050.224248449435,Casper-Riverton,hantavirus
+2026-05-10,10548.164965079044,Cheyenne,hantavirus
+2026-05-10,21082.17524080929,Chico-Redding,hantavirus
+2026-05-10,23833.939265946257,Colorado,hantavirus
+2026-05-10,13387.704522856968,Denver,hantavirus
+2026-05-10,20720.523653622644,El,hantavirus
+2026-05-10,21968.73239997844,Eugene,hantavirus
+2026-05-10,22211.980436698886,Fargo-Valley,hantavirus
+2026-05-10,27640.388491789705,Fresno-Visalia,hantavirus
+2026-05-10,19550.94660944425,Grand,hantavirus
+2026-05-10,22634.232648685647,Great,hantavirus
+2026-05-10,22667.91788293716,Idaho,hantavirus
+2026-05-10,21475.059487172704,Las,hantavirus
+2026-05-10,21490.958631870468,Los,hantavirus
+2026-05-10,19153.782415569745,Lubbock,hantavirus
+2026-05-10,22042.2866936952,Medford-Klamath,hantavirus
+2026-05-10,21344.599068235428,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-10,18538.158405439197,Missoula,hantavirus
+2026-05-10,19358.54653290466,Odessa-Midland,hantavirus
+2026-05-10,22507.256147268465,Phoenix,hantavirus
+2026-05-10,22306.208106242804,Portland,hantavirus
+2026-05-10,20937.974931301364,Rapid,hantavirus
+2026-05-10,21582.30193694731,Reno,hantavirus
+2026-05-10,21612.49460803412,Sacramento-Stockton-Modesto,hantavirus
+2026-05-10,23690.89088995868,Salt,hantavirus
+2026-05-10,22925.14375370673,San,hantavirus
+2026-05-10,23565.189117884544,San,hantavirus
+2026-05-10,21733.189144066,Seattle-Tacoma,hantavirus
+2026-05-10,24440.83630764852,Sioux,hantavirus
+2026-05-10,21810.516524634117,Spokane,hantavirus
+2026-05-10,21610.858885529557,Tucson,hantavirus
+2026-05-10,19455.52395443687,Twin,hantavirus
+2026-05-10,18845.04601658232,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-10,19917.69652280088,Yuma,hantavirus`;
+
+// Parser: handles repeated "San" by tagging first/second occurrence per date.
+function parseCSV(text){
+  const lines = text.trim().split(/\r?\n/);
+  const header = lines.shift();
+  const rows = [];
+  let lastDate = null, sanCount = 0;
+  for (const line of lines){
+    const [Date, SearchInterest, DMA, Term] = line.split(",");
+    if (Date !== lastDate){ sanCount = 0; lastDate = Date; }
+    let key = DMA;
+    if (DMA === "San"){ sanCount++; key = `San__${sanCount}`; }
+    const meta = DMA_LOOKUP[key];
+    if (!meta) continue; // skip unknown
+    rows.push({
+      Date,
+      SearchInterest: +SearchInterest,
+      DMA_Key: key,
+      DMA_Name: meta.name,
+      DMA_Code: meta.code,
+      Region: meta.region,
+      lat: meta.lat,
+      lng: meta.lng,
+      Term,
+    });
+  }
+  return rows;
+}
+
+// ------------------- Helpers ------------------------------------------------
+const fmt = n => {
+  if (n === null || n === undefined || Number.isNaN(n)) return "—";
+  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(2)+"M";
+  if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(1)+"k";
+  return Math.round(n).toLocaleString();
+};
+const pct = n => `${n>=0?"+":""}${(n*100).toFixed(0)}%`;
+
+// ---------- Animation primitives -----------------------------------------
+// useRAF: subscribes a callback to requestAnimationFrame, gives a t-delta in seconds.
+function useRAF(cb, active){
+  const ref = useRef();
+  useEffect(()=>{
+    if (!active) return;
+    let last = performance.now();
+    let raf;
+    const loop = (now) => {
+      const dt = (now - last) / 1000;
+      last = now;
+      cb(dt);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [active, cb]);
+  return ref;
+}
+
+// usePlayback: virtual time index in [0, n-1] that auto-advances at `speed` units/sec.
+// Returns { vIdx, playing, setPlaying, setVIdx, speed, setSpeed, reset }.
+function usePlayback(n, opts={}){
+  const { speed: initSpeed = 0.6, loop = true } = opts;
+  const [playing, setPlaying] = useState(true);
+  const [vIdx, setVIdx]     = useState(0);
+  const [speed, setSpeed]   = useState(initSpeed);
+  const cb = useCallback((dt) => {
+    setVIdx(v => {
+      const next = v + dt * speed;
+      if (next >= n - 1){
+        if (loop) return 0;
+        setPlaying(false);
+        return n - 1;
+      }
+      return next;
+    });
+  }, [n, speed, loop]);
+  useRAF(cb, playing);
+  const reset = () => setVIdx(0);
+  return { vIdx, playing, setPlaying, setVIdx, speed, setSpeed, reset };
+}
+
+// useAnimatedNumber: eases a number toward a target.
+function useAnimatedNumber(target, durationMs = 700){
+  const [v, setV] = useState(target);
+  const fromRef = useRef(target);
+  const startRef = useRef(performance.now());
+  useEffect(()=>{
+    fromRef.current = v;
+    startRef.current = performance.now();
+    let raf;
+    const tick = (now) => {
+      const t = Math.min(1, (now - startRef.current) / durationMs);
+      const e = 1 - Math.pow(1 - t, 3); // easeOutCubic
+      setV(fromRef.current + (target - fromRef.current) * e);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, durationMs]);
+  return v;
+}
+
+function AnimatedNumber({ value, format = (x)=> Math.round(x).toLocaleString(), className="" }){
+  const v = useAnimatedNumber(value);
+  return <span className={`num-anim ${className}`}>{format(v)}</span>;
+}
+
+// Biohazard ramp
+const RAMP = ["#0f172a","#7c2d12","#b45309","#dc2626","#ef4444","#f97316","#fbbf24"];
+function ramp(v, max){
+  if (!max) return RAMP[0];
+  const r = Math.min(1, Math.max(0, v/max));
+  if (r < 0.05) return RAMP[0];
+  if (r < 0.15) return RAMP[1];
+  if (r < 0.30) return RAMP[2];
+  if (r < 0.45) return RAMP[3];
+  if (r < 0.65) return RAMP[4];
+  if (r < 0.85) return RAMP[5];
+  return RAMP[6];
+}
+
+// ------------------- UI primitives ------------------------------------------
+function Card({ title, subtitle, glow, icon, children, right }){
+  const cls = glow ? `glow-${glow}` : "";
+  return (
+    <div className={`bg-slate-900/70 backdrop-blur rounded-2xl border border-slate-800 p-4 ${cls}`}>
+      <div className="flex items-start justify-between mb-3 gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-slate-100 font-semibold tracking-wide">
+            {icon}
+            <span className="truncate">{title}</span>
+          </div>
+          {subtitle && <div className="text-xs text-slate-400 mt-0.5">{subtitle}</div>}
+        </div>
+        {right}
+      </div>
+      {children}
+    </div>
+  );
+}
+function Stat({ label, value, sub, tone="slate" }){
+  const map = { red:"text-red-400", amber:"text-amber-400", cyan:"text-cyan-300", em:"text-emerald-400", violet:"text-violet-300", slate:"text-slate-200" };
+  return (
+    <div className="flex flex-col">
+      <span className="uppercase tracking-widest text-[10px] text-slate-500">{label}</span>
+      <span className={`text-2xl font-semibold mono ${map[tone]}`}>{value}</span>
+      {sub && <span className="text-xs text-slate-400 mt-0.5">{sub}</span>}
+    </div>
+  );
+}
+function Pill({ color="slate", children }){
+  const map = {
+    red:   "bg-red-500/15 text-red-300 border-red-500/40",
+    amber: "bg-amber-500/15 text-amber-300 border-amber-500/40",
+    em:    "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
+    cyan:  "bg-cyan-500/15 text-cyan-300 border-cyan-500/40",
+    violet:"bg-violet-500/15 text-violet-300 border-violet-500/40",
+    slate: "bg-slate-700/30 text-slate-300 border-slate-600/40",
+  };
+  return <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] mono ${map[color]}`}>{children}</span>;
+}
+
+// ------------------- Western US SVG map -------------------------------------
+function ProjMap({ data, onHover, gMax }){
+  const W = 720, H = 460;
+  const lonMin=-125, lonMax=-95, latMin=30, latMax=49.5;
+  const x = lon => ( (lon-lonMin) / (lonMax-lonMin) ) * W;
+  const y = lat => H - ( (lat-latMin) / (latMax-latMin) ) * H;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full">
+      <rect x="0" y="0" width={W} height={H} fill="#020617"/>
+      <g opacity="0.5">
+        {Array.from({length:8}).map((_,i)=>(<line key={i} x1="0" x2={W} y1={H*i/8} y2={H*i/8} stroke="#1e293b" strokeWidth="1" />))}
+        {Array.from({length:10}).map((_,i)=>(<line key={i} x1={W*i/10} x2={W*i/10} y1="0" y2={H} stroke="#1e293b" strokeWidth="1" />))}
+      </g>
+      {/* Four Corners */}
+      <rect x={x(-110)} y={y(38.5)} width={x(-107)-x(-110)} height={y(35.5)-y(38.5)}
+            fill="none" stroke="rgba(239,68,68,.45)" strokeDasharray="4 4" />
+      <text x={x(-109.5)} y={y(38.7)} fontSize="11" fill="#fca5a5" className="mono">Four Corners</text>
+      {/* Pacific NW */}
+      <rect x={x(-124)} y={y(48.5)} width={x(-117)-x(-124)} height={y(42.5)-y(48.5)}
+            fill="none" stroke="rgba(34,211,238,.45)" strokeDasharray="4 4" />
+      <text x={x(-123.5)} y={y(48.7)} fontSize="11" fill="#67e8f9" className="mono">Pacific NW</text>
+
+      {data.map(d => {
+        const cx = x(d.lng), cy = y(d.lat);
+        const intensity = gMax ? d.SearchInterest / gMax : 0;
+        const r = 4 + intensity * 32;
+        const fill = ramp(d.SearchInterest, gMax);
+        const glow = intensity > 0.4;
+        return (
+          <g key={d.DMA_Code} onMouseEnter={()=>onHover && onHover(d)} onMouseLeave={()=>onHover && onHover(null)}>
+            {glow && (
+              <circle cx={cx} cy={cy} r={r+10} fill={fill}
+                      className="breathe"
+                      style={{ "--rmin": (r+6)+"px", "--rmax": (r+18)+"px" }} />
+            )}
+            <circle className="marker-circle" cx={cx} cy={cy} r={r} fill={fill} opacity="0.90"
+                    stroke="#fde68a" strokeOpacity={intensity>0.6?0.7:0} strokeWidth="1"/>
+            <text x={cx+r+3} y={cy+3} fontSize="9" fill="#cbd5e1" className="mono">
+              {d.DMA_Name.split(/[ ,(-]/)[0]}
+            </text>
+          </g>
+        );
+      })}
+      {/* legend */}
+      <g transform={`translate(20, ${H-30})`}>
+        {RAMP.map((c,i)=>(
+          <g key={i} transform={`translate(${i*60},0)`}>
+            <rect width="55" height="10" fill={c} />
+            <text x="0" y="22" fontSize="10" fill="#94a3b8" className="mono">{Math.round(gMax*(i/6))}</text>
+          </g>
+        ))}
+        <text x="0" y="-5" fontSize="10" fill="#94a3b8" className="mono">SearchInterest (Google Health Trends, v1alpha)</text>
+      </g>
+    </svg>
+  );
+}
+
+// ------------------- DMA × Date heatmap (SVG) -------------------------------
+function HeatGrid({ rows, dates, dmas, gMax, activeIdx = -1 }){
+  const cellW = 60, cellH = 18, leftPad = 220, topPad = 30;
+  const W = leftPad + cellW * dates.length;
+  const H = topPad + cellH * dmas.length;
+  return (
+    <div className="scrollx scroll-thin">
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
+        {/* Active column highlight band */}
+        {activeIdx >= 0 && activeIdx < dates.length && (
+          <rect x={leftPad + activeIdx*cellW} y={topPad - 22} width={cellW} height={H - topPad + 22}
+                fill="rgba(253,230,138,.08)" stroke="rgba(253,230,138,.45)" strokeDasharray="3 3"/>
+        )}
+        {dates.map((d,i)=>(
+          <text key={d} x={leftPad + i*cellW + cellW/2} y={20} fontSize="10"
+                fill={i===activeIdx?"#fde68a":"#94a3b8"} textAnchor="middle" className="mono">{d.slice(5)}</text>
+        ))}
+        {dmas.map((dma,j) => (
+          <g key={dma.key}>
+            <text x={leftPad-8} y={topPad + j*cellH + 13} fontSize="10" fill="#cbd5e1" textAnchor="end" className="mono">{dma.name}</text>
+            {dates.map((d,i)=>{
+              const r = rows.find(x => x.Date === d && x.DMA_Key === dma.key);
+              const v = r ? r.SearchInterest : 0;
+              return (
+                <rect key={i} className={`heat-cell ${i===activeIdx?"heat-cell-active":""}`}
+                      x={leftPad + i*cellW + 1} y={topPad + j*cellH + 1}
+                      width={cellW-2} height={cellH-2}
+                      fill={ramp(v, gMax)} opacity={v>0?0.95:0.25}>
+                  <title>{`${dma.name} · ${d}\nSearchInterest: ${fmt(v)}`}</title>
+                </rect>
+              );
+            })}
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+// ------------------- Live ArcGIS status counts (best-effort fetch) ----------
+function useArcGIS(intervalMs = 60000){
+  const [state, setState] = useState({ loading:true, ok:false, counts:null, total:0, error:null, fetchedAt:null });
+  const poll = useCallback(() => {
+    const url = "https://services1.arcgis.com/wb4Og4gH5mvzQAIV/arcgis/rest/services/Tracking_Hantavirus_2026/FeatureServer/1/query?where=1%3D1&outFields=*&f=geojson&resultRecordCount=2000";
+    fetch(url, { method:"GET" })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error("HTTP "+r.status)))
+      .then(j => {
+        const feats = (j && j.features) || [];
+        const counts = { CONFIRMED:0, DECEASED:0, SUSPECTED:0, MONITORING:0, OTHER:0 };
+        feats.forEach(f => {
+          const s = ((f.properties && (f.properties.STATUS || f.properties.Status || f.properties.status)) || "").toUpperCase();
+          if (counts[s] !== undefined) counts[s]++; else counts.OTHER++;
+        });
+        setState({ loading:false, ok:true, counts, total:feats.length, error:null, fetchedAt:new Date().toISOString() });
+      })
+      .catch(e => setState({ loading:false, ok:false, counts:null, total:0, error:String(e), fetchedAt:new Date().toISOString() }));
+  }, []);
+  useEffect(()=>{
+    poll();
+    const id = setInterval(poll, intervalMs);
+    return () => clearInterval(id);
+  }, [poll, intervalMs]);
+  return { ...state, refetch: poll };
+}
+
+// ---------- Live ticker -----------------------------------------------------
+function Ticker({ items }){
+  // duplicate the items so the CSS marquee can loop seamlessly
+  const stream = [...items, ...items];
+  return (
+    <div className="bg-slate-900/70 border-y border-slate-800 overflow-hidden">
+      <div className="max-w-[1500px] mx-auto px-4 py-1.5">
+        <div className="ticker-track text-[11px] mono text-slate-300">
+          {stream.map((it,i) => (
+            <span key={i} className="inline-flex items-center gap-2">
+              <span className={`inline-block w-2 h-2 rounded-full ${it.tone==='red'?'bg-red-500':it.tone==='amber'?'bg-amber-400':it.tone==='cyan'?'bg-cyan-400':'bg-emerald-400'}`}></span>
+              <span className={it.tone==='red'?'text-red-300':it.tone==='amber'?'text-amber-300':it.tone==='cyan'?'text-cyan-300':'text-emerald-300'}>{it.tag}</span>
+              <span className="text-slate-300">{it.msg}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ------------------- Source registry (43 sources, 6 categories) -------------
+const SOURCES = {
+  "Live data": [
+    ["ArcGIS Online — Tracking the Hantavirus Outbreak","https://www.arcgis.com/apps/dashboards/5c68442d2afc42d7ba2696e4cd393729","Primary live data source. Independent tracking dashboard (Kimberly Panozzo / GISAG). Confirmed deaths, confirmed cases, suspected cases, monitoring linked to the MV Hondius cluster."],
+    ["HealthMap — global outbreak feed","https://www.healthmap.org/en/","Aggregated, machine-curated alerts from official sources, validated news, eyewitness reports. Filter for 'hantavirus'."],
+    ["ProMED-mail (ISID)","https://promedmail.org/promed-posts/?fcategory=Select+Category&kwby=summary&search=hantavirus","Internationally trusted infectious-disease alerting network. Original signal channel for most novel hantavirus events."],
+  ],
+  "Health agencies": [
+    ["WHO — Disease Outbreak News (DON599)","https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON599","WHO situation report on the Andes virus cluster."],
+    ["U.S. CDC — Hantavirus","https://www.cdc.gov/hantavirus/","Hantavirus background, HPS clinical guidance, U.S. case counts."],
+    ["ECDC — Threats & Outbreaks","https://www.ecdc.europa.eu/en/threats-and-outbreaks","EU-wide threat assessments and weekly Communicable Disease Threats Reports."],
+    ["UKHSA","https://www.gov.uk/government/news/ukhsa-update-on-the-hantavirus-cruise-ship-outbreak","UK updates on monitored returnees and contacts."],
+    ["PAHO","https://www.paho.org/en/topics/hantavirus","Americas-region surveillance — Andes virus signal in Argentina, Chile, the Southern Cone."],
+    ["Ministerio de Sanidad (Spain)","https://www.sanidad.gob.es/","Spanish national health ministry — port-of-arrival contact tracing for the MV Hondius."],
+    ["Robert Koch Institute (Germany)","https://www.rki.de/EN/Home/homepage_node.html","RKI weekly epidemiological bulletin — German returnees and EU surveillance."],
+    ["Santé publique France","https://www.santepubliquefrance.fr/","French national public-health agency outbreak bulletins."],
+    ["BAG (Switzerland)","https://www.bag.admin.ch/","Swiss federal health office case communications."],
+    ["DGS (Portugal)","https://www.dgs.pt/","Portuguese DGS — Cape Verde / Atlantic crossing contact tracing."],
+    ["Ministerio de Salud (Argentina)","https://www.argentina.gob.ar/salud","Argentine ministry — Andes virus endemic to Patagonia; relevant to ship's Ushuaia origin."],
+    ["Ministerio de Salud (Chile)","https://www.minsal.cl/","Chilean ministry — Andes virus reservoir and historical case data."],
+  ],
+  "Wires": [
+    ["Reuters — Health","https://www.reuters.com/business/healthcare-pharmaceuticals/","Global newswire health desk; usually first with verified WHO/CDC briefings."],
+    ["Associated Press — Health","https://apnews.com/hub/health","AP health wire; widely syndicated outbreak reporting."],
+    ["AFP — Health","https://www.afp.com/en/news-hub/834","French wire service; strong on European and African ports of call."],
+    ["Bloomberg — Prognosis","https://www.bloomberg.com/health","Outbreak coverage with travel-industry and economic angle."],
+  ],
+  "Global press": [
+    ["BBC News — Health","https://www.bbc.com/news/health","International reporting and verification, strong UK angle."],
+    ["NYT — Health","https://www.nytimes.com/section/health","Long-form reporting and U.S. case angle."],
+    ["Washington Post — Health","https://www.washingtonpost.com/health/","U.S. federal response and CDC reporting."],
+    ["The Guardian — Global health","https://www.theguardian.com/society/health","Independent UK reporting with strong global-health desk."],
+    ["FT — Health","https://www.ft.com/health","Travel-industry and biotech angle on the outbreak."],
+    ["CNN — Tenerife outbreak","https://www.cnn.com/2026/05/07/world/hantavirus-ship-tenerife-outbreak-intl","International reporting on outbreak progression."],
+    ["USA Today — WHO statement","https://www.usatoday.com/story/travel/cruises/2026/05/03/hantavirus-cruise-ship-world-health-organization/89921995007/","Initial outbreak reporting and U.S. passenger angle."],
+    ["CBC News — Hondius Andes strain","https://www.cbc.ca/news/health/hondius-ship-hantavirus-andes-strain-9.7189281","Strain identification reporting, Canadian angle."],
+    ["Al Jazeera English — Health","https://www.aljazeera.com/tag/health/","Global South perspective on the outbreak and travel restrictions."],
+  ],
+  "Regional press": [
+    ["El País (Spain) — Sanidad","https://elpais.com/noticias/sanidad/","Spain's paper of record; primary coverage as the ship arrives in Cádiz/Tenerife."],
+    ["El Mundo (Spain) — Salud","https://www.elmundo.es/ciencia-y-salud/salud.html","Spanish daily; port-of-arrival reporting and Canary Islands angle."],
+    ["NOS (Netherlands)","https://nos.nl/artikel/2613426-stewardess-mogelijk-ook-besmet-met-hanta-ligt-in-amsterdam-umc","Dutch national broadcaster — Amsterdam UMC monitoring and Oceanwide Expeditions."],
+    ["Le Monde — Santé","https://www.lemonde.fr/sante/","French daily of record; EU-coordinated response coverage."],
+    ["Der Spiegel — Gesundheit","https://www.spiegel.de/gesundheit/","German weekly; passenger contact tracing in DACH region."],
+    ["Corriere della Sera — Salute","https://www.corriere.it/salute/","Italian daily; Mediterranean port surveillance."],
+    ["Público (Portugal)","https://www.publico.pt/saude","Portuguese daily; Cape Verde and Madeira-leg reporting."],
+    ["Clarín (Argentina)","https://www.clarin.com/sociedad/salud/","Argentine daily; Ushuaia origin and Andes virus background."],
+    ["La Nación (Argentina)","https://www.lanacion.com.ar/sociedad/","Argentine daily; complementary Patagonia coverage."],
+    ["Channel News Asia","https://www.channelnewsasia.com/singapore/hantavirus-mv-hondius-ncid-test-virus-isolated-cda-6106671","Singapore reporting on suspected returnees."],
+  ],
+  "Science": [
+    ["Live Science — Hantavirus live blog","https://www.livescience.com/health/viruses-infections-disease/live/hantavirus-outbreak","Running live blog tracking the MV Hondius cluster."],
+    ["STAT News — Infectious disease","https://www.statnews.com/category/infectious-disease/","Specialist health-and-science newsroom; expert reporting on virology and outbreak response."],
+    ["Nature — News","https://www.nature.com/news","Peer-reviewed research, sequencing updates, expert commentary."],
+    ["Science (AAAS) — News","https://www.science.org/news","Expert reporting on Andes virus genetics and zoonotic transmission research."],
+    ["CIDRAP (UMN)","https://www.cidrap.umn.edu/","Center for Infectious Disease Research and Policy — daily expert outbreak briefing."],
+    ["Hantavirus Surveillance — Global Dashboard","https://hantaviruslive.info/","Sister global situational dashboard."],
+  ],
+};
+
+// ====================== MAIN APP ============================================
+function App(){
+  const rows = useMemo(()=> parseCSV(CSV), []);
+  const dates = useMemo(()=> Array.from(new Set(rows.map(r=>r.Date))).sort(), [rows]);
+  const dmas  = useMemo(()=> {
+    const seen = new Map();
+    rows.forEach(r => { if (!seen.has(r.DMA_Key)) seen.set(r.DMA_Key, { key:r.DMA_Key, name:r.DMA_Name, code:r.DMA_Code, region:r.Region, lat:r.lat, lng:r.lng }); });
+    return [...seen.values()].sort((a,b)=> a.name.localeCompare(b.name));
+  }, [rows]);
+
+  // global max across all dates × dmas (for color normalization)
+  const gMax = useMemo(()=> rows.reduce((m,r)=> r.SearchInterest>m?r.SearchInterest:m, 0), [rows]);
+
+  // National daily aggregates
+  const national = useMemo(()=>{
+    return dates.map(d => {
+      const day = rows.filter(r => r.Date === d);
+      const total = day.reduce((s,r)=> s + r.SearchInterest, 0);
+      const mean  = total / day.length;
+      const active = day.filter(r => r.SearchInterest > 0).length;
+      const max = day.reduce((m,r)=> r.SearchInterest>m?r.SearchInterest:m, 0);
+      return { Date: d, Total: +total.toFixed(0), Mean: +mean.toFixed(1), ActiveDMAs: active, Peak: +max.toFixed(0) };
+    });
+  }, [dates, rows]);
+
+  // Peak DMA + peak date
+  const peakRow = useMemo(()=> rows.slice().sort((a,b)=> b.SearchInterest - a.SearchInterest)[0], [rows]);
+  // 7-day surge: D-(start) vs D-(peak)
+  const t0 = national[0], tpk = national.slice().sort((a,b)=> b.Total - a.Total)[0];
+  const surgeMult = tpk.Total / Math.max(1, t0.Total);
+
+  // Per-DMA aggregates
+  const dmaAgg = useMemo(()=>{
+    return dmas.map(d => {
+      const arr = rows.filter(r => r.DMA_Key === d.key);
+      const total = arr.reduce((s,r)=> s + r.SearchInterest, 0);
+      const peak = arr.reduce((m,r)=> r.SearchInterest>m?r.SearchInterest:m, 0);
+      const peakDate = (arr.find(r => r.SearchInterest === peak) || {}).Date;
+      const last = arr[arr.length-1];
+      const first = arr[0];
+      // baseline = mean of days 1–2 (pre-outbreak); surge = mean of days 4–7 (post-outbreak)
+      const base = (arr[0].SearchInterest + arr[1].SearchInterest)/2;
+      const peakWin = arr.slice(3,7).reduce((s,r)=>s+r.SearchInterest,0)/4;
+      const ratio = base > 0 ? peakWin / base : (peakWin > 0 ? 9999 : 0);
+      // velocity: last vs prior day
+      const prev = arr[arr.length-2] || first;
+      const delta = last.SearchInterest - prev.SearchInterest;
+      return { ...d, total, peak, peakDate, last:last.SearchInterest, base, peakWin, ratio, delta };
+    });
+  }, [rows, dmas]);
+
+  // "Broken the silence" : DMAs that were zero on May 1–2 and surged on/after May 3
+  const silenceBroken = useMemo(()=>{
+    return dmaAgg.filter(d => d.base === 0 && d.peak > 0).sort((a,b)=> b.peak - a.peak);
+  }, [dmaAgg]);
+
+  // ----- Playback engine: virtual time index in [0, dates.length - 1] -----
+  const playback = usePlayback(dates.length, { speed: 0.6, loop: true });
+  const vIdx = playback.vIdx;
+  const iA = Math.max(0, Math.min(dates.length-1, Math.floor(vIdx)));
+  const iB = Math.min(dates.length-1, iA + 1);
+  const tFrac = vIdx - iA;
+  const snapDate = dates[iA];
+  const snapDateNext = dates[iB];
+
+  // Interpolated snapshot: lerp between dates[iA] and dates[iA+1]
+  const snapshot = useMemo(()=>{
+    const rowsA = rows.filter(r => r.Date === snapDate);
+    const rowsB = rows.filter(r => r.Date === snapDateNext);
+    const byKeyB = new Map(rowsB.map(r => [r.DMA_Key, r]));
+    return rowsA.map(a => {
+      const b = byKeyB.get(a.DMA_Key) || a;
+      return { ...a, SearchInterest: a.SearchInterest + (b.SearchInterest - a.SearchInterest) * tFrac };
+    });
+  }, [rows, snapDate, snapDateNext, tFrac]);
+
+  // Interpolated national totals for animated stat cards
+  const nationalNow = useMemo(()=>{
+    const A = national[iA], B = national[iB] || national[iA];
+    return {
+      Date: snapDate,
+      Total:      A.Total      + (B.Total      - A.Total)      * tFrac,
+      Mean:       A.Mean       + (B.Mean       - A.Mean)       * tFrac,
+      ActiveDMAs: A.ActiveDMAs + (B.ActiveDMAs - A.ActiveDMAs) * tFrac,
+      Peak:       A.Peak       + (B.Peak       - A.Peak)       * tFrac,
+    };
+  }, [national, iA, iB, snapDate, tFrac]);
+
+  // Heatmap rows ordered by total descending
+  const heatDMAs = useMemo(()=> [...dmaAgg].sort((a,b)=> b.total - a.total), [dmaAgg]);
+
+  // Risk advisory (national-level threshold)
+  const advisory = (() => {
+    const latest = national[national.length-1];
+    if (latest.Mean > 30000) return { level:"HIGH",     tone:"red",   note:"Sustained nationwide surge; mean SearchInterest > 30k across Western DMAs." };
+    if (latest.Mean > 5000)  return { level:"ELEVATED", tone:"amber", note:"Rapid silence-break detected; signal active across majority of Western DMAs." };
+    return { level:"LOW", tone:"em", note:"Baseline ecological dormancy; routine vigilance." };
+  })();
+
+  const arc = useArcGIS(60000); // auto-poll every 60s
+
+  // Live ticker items — derived from data + ArcGIS overlay
+  const tickerItems = useMemo(()=>{
+    const items = [];
+    items.push({ tone:"red",   tag:"PEAK",          msg:`${peakRow.DMA_Name} reached ${fmt(peakRow.SearchInterest)} on ${peakRow.Date}` });
+    items.push({ tone:"amber", tag:"SURGE",         msg:`National Σ jumped from ${fmt(t0.Total)} → ${fmt(tpk.Total)} (${surgeMult>1000?"≥10³":surgeMult.toFixed(0)+"×"})` });
+    items.push({ tone:"em",    tag:"SILENCE-BREAK", msg:`${silenceBroken.length}/${dmas.length} rural DMAs recovered from k-anon suppression` });
+    items.push({ tone:"cyan",  tag:"WHO",           msg:"DON599 — Andes virus cluster (MV Hondius); strain ID via CBC News" });
+    items.push({ tone:"red",   tag:"CDC",           msg:"HPS clinical guidance active for Western US DMAs" });
+    if (arc.ok && arc.counts){
+      items.push({ tone:"red",   tag:"ARCGIS", msg:`Live overlay · Confirmed ${arc.counts.CONFIRMED} · Deceased ${arc.counts.DECEASED} · Suspected ${arc.counts.SUSPECTED} · Monitoring ${arc.counts.MONITORING}` });
+    } else {
+      items.push({ tone:"cyan",  tag:"ARCGIS", msg:"FeatureServer/1 polling every 60s — fallback to direct link if CORS-blocked" });
+    }
+    items.push({ tone:"amber", tag:"ECDC",  msg:"Weekly Communicable Disease Threats Report — EU returnees monitored" });
+    items.push({ tone:"em",    tag:"PAHO",  msg:"Americas-region surveillance · Argentina + Chile reservoir tracking" });
+    return items;
+  }, [peakRow, t0, tpk, surgeMult, silenceBroken, dmas, arc]);
+
+  const [hover, setHover] = useState(null);
+  useEffect(()=>{ if (window.lucide) window.lucide.createIcons(); });
+  const I = (name, cls="w-4 h-4") => <i data-lucide={name} className={cls}></i>;
+
+  // First/last date of data
+  const dateFirst = dates[0], dateLast = dates[dates.length-1];
+
+  return (
+    <div className="grid-bg min-h-screen">
+      {/* HEADER */}
+      <header className="sticky top-0 z-30 bg-slate-950/85 backdrop-blur border-b border-slate-800/80">
+        <div className="max-w-[1500px] mx-auto px-5 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-red-500/15 border border-red-500/40 flex items-center justify-center">{I("biohazard","w-5 h-5 text-red-400")}</div>
+            <div>
+              <div className="text-sm uppercase tracking-[0.25em] text-slate-300">E-BEWS USA · Hantavirus Digital Epidemiology</div>
+              <div className="text-xs text-slate-500 mono">Command Center · DMA Resolution · Google Health Trends v1alpha + ArcGIS FeatureServer overlay</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-slate-400">
+            <span className="pulse-dot">LIVE</span>
+            <Pill color="slate">data window {dateFirst} → {dateLast}</Pill>
+            <Pill color="amber">t = {snapDate}</Pill>
+            <Pill color={advisory.tone}>{advisory.level} RISK</Pill>
+          </div>
+        </div>
+      </header>
+
+      <Ticker items={tickerItems}/>
+
+      {/* Global playback control bar */}
+      <div className="bg-slate-950/85 backdrop-blur border-b border-slate-800/80">
+        <div className="max-w-[1500px] mx-auto px-5 py-2 flex items-center gap-3 text-xs text-slate-300">
+          <button className="btn-ghost" onClick={()=> playback.setPlaying(p => !p)}>
+            {playback.playing ? "❚❚ Pause" : "▶ Play"}
+          </button>
+          <button className="btn-ghost" onClick={()=> playback.reset()}>⟲ Reset</button>
+          <div className="flex items-center gap-1">
+            {[0.25, 0.6, 1.2, 2.5].map(s => (
+              <button key={s} className="btn-ghost" data-active={playback.speed===s} onClick={()=> playback.setSpeed(s)}>{s}×</button>
+            ))}
+          </div>
+          <input type="range" min={0} max={dates.length-1} step={0.01}
+                 value={playback.vIdx}
+                 onChange={e=> { playback.setPlaying(false); playback.setVIdx(parseFloat(e.target.value)); }}
+                 className="scrubber flex-1"/>
+          <span className="mono w-44 text-right">
+            {snapDate} <span className="text-slate-500">→</span> {snapDateNext}
+            <span className="text-slate-500"> ({(tFrac*100).toFixed(0)}%)</span>
+          </span>
+        </div>
+      </div>
+
+      <main className="max-w-[1500px] mx-auto px-5 py-5 grid grid-cols-12 gap-5">
+
+        {/* ===== EXECUTIVE CARDS ===== */}
+        <section className="col-span-12 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <Card title="Live National Σ (interpolated)" subtitle={`now @ t = ${snapDate} → ${snapDateNext}`} glow="red" icon={I("activity","w-4 h-4 text-red-400")}>
+            <div className="flex flex-col">
+              <span className="uppercase tracking-widest text-[10px] text-slate-500">Σ SearchInterest</span>
+              <span className="text-2xl font-semibold mono text-red-400"><AnimatedNumber value={nationalNow.Total} format={fmt}/></span>
+              <span className="text-xs text-slate-400 mt-0.5">mean <AnimatedNumber value={nationalNow.Mean} format={fmt}/> · active <AnimatedNumber value={nationalNow.ActiveDMAs} format={x=>Math.round(x)}/>/{dmas.length}</span>
+            </div>
+          </Card>
+          <Card title="National Surge Multiplier" subtitle="Σ peak day ÷ start day" glow="amber" icon={I("flame","w-4 h-4 text-amber-400")}>
+            <Stat label={`${tpk.Date} vs ${t0.Date}`} value={`${surgeMult>1000?"≥10³×":surgeMult.toFixed(0)+"×"}`} sub={`peak Σ ${fmt(tpk.Total)} · start Σ ${fmt(t0.Total)}`} tone="amber"/>
+          </Card>
+          <Card title="Most Active DMA" subtitle="Σ SearchInterest over 10-day window" glow="cyan" icon={I("map-pin","w-4 h-4 text-cyan-300")}>
+            {(() => { const top = [...dmaAgg].sort((a,b)=>b.total-a.total)[0];
+              return <Stat label={top.region} value={top.name.split(/[ ,(-]/)[0]} sub={`Σ ${fmt(top.total)} · peak ${fmt(top.peak)} on ${top.peakDate}`} tone="cyan"/>;
+            })()}
+          </Card>
+          <Card title="Silence-Break Count" subtitle="DMAs zero on May 1–2 → active by May 3+" glow="em" icon={I("volume-2","w-4 h-4 text-emerald-400")}>
+            <Stat label="rural DMAs recovered" value={`${silenceBroken.length}/${dmas.length}`} sub="Grouped Expression methodology defeating k-anonymity" tone="em"/>
+          </Card>
+        </section>
+
+        {/* ===== NATIONAL TREND + ADVISORY ===== */}
+        <section className="col-span-12 xl:col-span-8">
+          <Card
+            title="Digital EKG — National Aggregate Trend"
+            subtitle="Σ SearchInterest across all Western DMAs · daily peak overlay"
+            glow="red"
+            icon={I("heart-pulse","w-4 h-4 text-red-400")}
+            right={<Pill color="amber">surge ratio {surgeMult>1000?"≥10³":surgeMult.toFixed(0)}×</Pill>}
+          >
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={national} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gTot" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#ef4444" stopOpacity="0.55"/>
+                      <stop offset="100%" stopColor="#ef4444" stopOpacity="0.0"/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke="#1e293b" />
+                  <XAxis dataKey="Date" tick={{ fill:"#94a3b8", fontSize:10 }} />
+                  <YAxis tick={{ fill:"#94a3b8", fontSize:10 }} tickFormatter={fmt}/>
+                  <Tooltip contentStyle={{ background:"#0f172a", border:"1px solid #334155", color:"#e2e8f0" }} formatter={(v)=> fmt(v)} />
+                  <Area  type="monotone" dataKey="Total"    stroke="#ef4444" fill="url(#gTot)" name="Σ SearchInterest"/>
+                  <Line  type="monotone" dataKey="Peak"     stroke="#f59e0b" dot={true} strokeWidth={2} name="Daily peak DMA"/>
+                  <ReferenceLine x={tpk.Date} stroke="#fbbf24" strokeDasharray="3 3" label={{ value:`peak ${tpk.Date}`, fill:"#fbbf24", fontSize:10, position:"insideTop" }}/>
+                  <ReferenceArea x1={dates[0]} x2={dates[1]} fill="#22d3ee" fillOpacity={0.08} stroke="none" label={{ value:"rural silence", fill:"#67e8f9", fontSize:10, position:"insideTop" }}/>
+                  {/* Live sweep marker — moves as playback advances */}
+                  <ReferenceLine x={snapDate} stroke="#fde68a" strokeWidth={2} label={{ value:"NOW", fill:"#fde68a", fontSize:10, position:"top" }}/>
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-2 grid grid-cols-3 gap-3 text-xs">
+              {national.map(n => (
+                <div key={n.Date} className="bg-slate-900/50 rounded-lg border border-slate-800 p-2">
+                  <div className="mono text-slate-400">{n.Date}</div>
+                  <div className="text-slate-100 mono">Σ {fmt(n.Total)} · mean {fmt(n.Mean)} · active {n.ActiveDMAs}/{dmas.length}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </section>
+
+        <aside className="col-span-12 xl:col-span-4 grid gap-4">
+          <Card title="Public Health Advisory" subtitle="Live national synthesis" glow={advisory.tone} icon={I("siren","w-4 h-4 text-red-400")}>
+            <div className={`rounded-xl p-4 border ${advisory.tone==='red' ? 'bg-red-500/10 border-red-500/40' : advisory.tone==='amber' ? 'bg-amber-500/10 border-amber-500/40' : 'bg-emerald-500/10 border-emerald-500/40'}`}>
+              <div className="flex items-center justify-between">
+                <span className="uppercase tracking-widest text-xs text-slate-300">Current Level</span>
+                <Pill color={advisory.tone}>{advisory.level}</Pill>
+              </div>
+              <div className="mt-2 text-sm text-slate-200">{advisory.note}</div>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-slate-900/60 rounded-lg p-2 border border-slate-800">
+                  <div className="text-slate-400">Latest mean</div>
+                  <div className="mono text-slate-100">{fmt(national[national.length-1].Mean)}</div>
+                </div>
+                <div className="bg-slate-900/60 rounded-lg p-2 border border-slate-800">
+                  <div className="text-slate-400">Latest Σ</div>
+                  <div className="mono text-slate-100">{fmt(national[national.length-1].Total)}</div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 text-[11px] text-slate-400">
+              Action vector: target <span className="text-amber-300">"Safe Cleaning"</span> intervention to high-Σ DMAs below (e.g., DMA 651 Lubbock, DMA 753 Phoenix, DMA 819 Seattle-Tacoma).
+            </div>
+          </Card>
+
+          {/* ArcGIS live overlay */}
+          <Card title="ArcGIS Live Case Overlay" subtitle="Tracking_Hantavirus_2026 · FeatureServer/1 · polls 60s"
+                glow="violet" icon={I("satellite","w-4 h-4 text-violet-300")}
+                right={<button className="btn-ghost" onClick={()=> arc.refetch && arc.refetch()}>⟳ refresh</button>}>
+            {arc.loading && <div className="text-xs text-slate-400">contacting FeatureServer…</div>}
+            {arc.ok && arc.counts && (
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-rose-500/10 border border-rose-500/40 rounded-lg p-2">
+                  <div className="text-[10px] uppercase text-rose-200">Deceased</div>
+                  <div className="mono text-xl text-rose-200"><AnimatedNumber value={arc.counts.DECEASED}/></div>
+                </div>
+                <div className="bg-red-500/10 border border-red-500/40 rounded-lg p-2">
+                  <div className="text-[10px] uppercase text-red-200">Confirmed</div>
+                  <div className="mono text-xl text-red-200"><AnimatedNumber value={arc.counts.CONFIRMED}/></div>
+                </div>
+                <div className="bg-amber-500/10 border border-amber-500/40 rounded-lg p-2">
+                  <div className="text-[10px] uppercase text-amber-200">Suspected</div>
+                  <div className="mono text-xl text-amber-200"><AnimatedNumber value={arc.counts.SUSPECTED}/></div>
+                </div>
+                <div className="bg-cyan-500/10 border border-cyan-500/40 rounded-lg p-2">
+                  <div className="text-[10px] uppercase text-cyan-200">Monitoring</div>
+                  <div className="mono text-xl text-cyan-200"><AnimatedNumber value={arc.counts.MONITORING}/></div>
+                </div>
+                <div className="col-span-2 text-[11px] text-slate-400">total features: <AnimatedNumber value={arc.total}/> · last refresh <span className="mono">{arc.fetchedAt && arc.fetchedAt.slice(11,19)}</span></div>
+              </div>
+            )}
+            {!arc.ok && !arc.loading && (
+              <div className="text-[12px] text-slate-300 leading-relaxed">
+                <div className="text-rose-300 mono mb-1">offline / CORS blocked</div>
+                Last attempt: <span className="mono">{arc.fetchedAt}</span><br/>
+                Open the FeatureServer directly: <a className="text-cyan-300 underline" target="_blank" rel="noreferrer" href="https://services1.arcgis.com/wb4Og4gH5mvzQAIV/arcgis/rest/services/Tracking_Hantavirus_2026/FeatureServer/1/query?where=1%3D1&outFields=*&f=geojson&resultRecordCount=2000">FeatureServer/1/query</a>
+              </div>
+            )}
+            <div className="mt-2 text-[11px] text-slate-500">
+              Status field values: CONFIRMED · DECEASED · SUSPECTED · MONITORING. Independent research feed (Panozzo / GISAG). Tentative counts; situational awareness only.
+            </div>
+          </Card>
+        </aside>
+
+        {/* ===== MAP + SNAPSHOT CONTROLS ===== */}
+        <section className="col-span-12 xl:col-span-8">
+          <Card
+            title="Geospatial Risk Heatmap — Western US (DMA resolution)"
+            subtitle="Snapshot per date · symbol radius & color = SearchInterest · biohazard ramp"
+            glow="red"
+            icon={I("globe-2","w-4 h-4 text-red-400")}
+            right={
+              <div className="flex items-center gap-2">
+                {hover ? <Pill color="amber">{hover.DMA_Name} · {fmt(hover.SearchInterest)}</Pill> : <Pill color="slate">hover a DMA</Pill>}
+                <Pill color="cyan">t = {snapDate} ({(tFrac*100).toFixed(0)}%)</Pill>
+                <button className="btn-ghost" onClick={()=> playback.setPlaying(p => !p)}>{playback.playing?"❚❚":"▶"}</button>
+              </div>
+            }
+          >
+            <div className="h-[460px] rounded-xl overflow-hidden border border-slate-800 bg-slate-950/70">
+              <ProjMap data={snapshot} gMax={gMax} onHover={setHover}/>
+            </div>
+            <div className="mt-2 flex items-center gap-2 flex-wrap text-[11px] text-slate-400">
+              <Pill color="red">Four Corners endemic zone</Pill>
+              <Pill color="cyan">Pacific NW reservoir corridor</Pill>
+              <span>· global max in window = <span className="mono text-slate-200">{fmt(gMax)}</span></span>
+            </div>
+          </Card>
+        </section>
+
+        {/* ===== LEADERBOARD ===== */}
+        <aside className="col-span-12 xl:col-span-4">
+          <Card title="Top-15 DMA · 10-day Σ" subtitle="Cumulative SearchInterest" glow="cyan" icon={I("list-ordered","w-4 h-4 text-cyan-300")}>
+            <div className="h-[460px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={[...dmaAgg].sort((a,b)=>b.total-a.total).slice(0,15)} layout="vertical" margin={{ left: 4, right: 24 }}>
+                  <CartesianGrid stroke="#1e293b" horizontal={false} />
+                  <XAxis type="number" tick={{ fill:"#94a3b8", fontSize:10 }} tickFormatter={fmt}/>
+                  <YAxis dataKey="name" type="category" tick={{ fill:"#cbd5e1", fontSize:10 }} width={160}/>
+                  <Tooltip contentStyle={{ background:"#0f172a", border:"1px solid #334155", color:"#e2e8f0" }} formatter={(v)=> fmt(v)}/>
+                  <Bar dataKey="total" radius={[0,6,6,0]}>
+                    {[...dmaAgg].sort((a,b)=>b.total-a.total).slice(0,15).map((s,i)=>(
+                      <Cell key={i} fill={i<3 ? "#ef4444" : i<7 ? "#f59e0b" : "#22d3ee"}/>
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </aside>
+
+        {/* ===== HEATMAP ===== */}
+        <section className="col-span-12">
+          <Card
+            title="DMA × Date Intensity Matrix"
+            subtitle="Full 41 × 10 grid · ordered by 10-day Σ · cell color encodes daily SearchInterest"
+            glow="amber"
+            icon={I("grid-3x3","w-4 h-4 text-amber-400")}
+          >
+            <HeatGrid rows={rows} dates={dates} dmas={heatDMAs} gMax={gMax} activeIdx={iA}/>
+            <div className="mt-2 text-[11px] text-slate-400">
+              May 1–2 ≈ <span className="text-cyan-300">"Rural Silence"</span> (only 6–7 DMAs emit, ABQ leads). May 3 = <span className="text-amber-300">simultaneous nationwide silence-break</span> across 39/41 DMAs. May 4–8 plateau. Decay May 9–10.
+            </div>
+          </Card>
+        </section>
+
+        {/* ===== SILENCE-BREAK TABLE ===== */}
+        <section className="col-span-12 xl:col-span-6">
+          <Card title="Silence-Break Tracker" subtitle="DMAs with 0 baseline (May 1–2) that surged ≥ May 3" glow="em" icon={I("zap","w-4 h-4 text-emerald-400")}>
+            <div className="max-h-[360px] overflow-auto scroll-thin pr-2">
+              <table className="w-full text-xs">
+                <thead><tr className="text-slate-500 uppercase tracking-widest">
+                  <th className="text-left py-1">DMA</th><th className="text-right">Region</th>
+                  <th className="text-right">Baseline</th><th className="text-right">Peak</th><th className="text-right">PeakDate</th>
+                </tr></thead>
+                <tbody>
+                  {silenceBroken.map(s => (
+                    <tr key={s.code} className="border-t border-slate-800/60 hover:bg-slate-800/30">
+                      <td className="py-1.5"><div className="text-slate-200">{s.name}</div><div className="text-[10px] text-slate-500">DMA {s.code}</div></td>
+                      <td className="text-right text-slate-400">{s.region}</td>
+                      <td className="text-right mono text-slate-400">0</td>
+                      <td className="text-right mono text-rose-300">{fmt(s.peak)}</td>
+                      <td className="text-right mono text-amber-300">{s.peakDate}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </section>
+
+        {/* ===== SURGE VELOCITY ===== */}
+        <section className="col-span-12 xl:col-span-6">
+          <Card title="Surge Velocity (Δ today vs prior)" subtitle="Late-window change in SearchInterest" glow="amber" icon={I("trending-up","w-4 h-4 text-amber-400")}>
+            <div className="h-[360px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={[...dmaAgg].sort((a,b)=> b.delta - a.delta).slice(0,15)} layout="vertical" margin={{ left: 4, right: 24 }}>
+                  <CartesianGrid stroke="#1e293b" horizontal={false} />
+                  <XAxis type="number" tick={{ fill:"#94a3b8", fontSize:10 }} tickFormatter={fmt}/>
+                  <YAxis dataKey="name" type="category" tick={{ fill:"#cbd5e1", fontSize:10 }} width={160}/>
+                  <Tooltip contentStyle={{ background:"#0f172a", border:"1px solid #334155", color:"#e2e8f0" }} formatter={(v)=> fmt(v)}/>
+                  <Bar dataKey="delta" radius={[0,6,6,0]}>
+                    {[...dmaAgg].sort((a,b)=> b.delta - a.delta).slice(0,15).map((s,i)=>(
+                      <Cell key={i} fill={s.delta>=0 ? "#22c55e" : "#ef4444"}/>
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </section>
+
+        {/* ===== OUTBREAK CONTEXT (MV HONDIUS) ===== */}
+        <section className="col-span-12">
+          <Card title="Outbreak Context · MV Hondius / Andes virus cluster" subtitle="Cross-referenced with ArcGIS Tracking_Hantavirus_2026 FeatureServer" glow="violet" icon={I("ship","w-4 h-4 text-violet-300")}>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-violet-300 font-semibold mb-1">Origin</div>
+                Ushuaia, Argentina (Patagonia) — Andes virus endemic range. Reservoir: <em>Oligoryzomys longicaudatus</em>.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-violet-300 font-semibold mb-1">Atlantic transit</div>
+                Cape Verde → Madeira → Cádiz/Tenerife. Port-of-arrival contact tracing by Spain (Ministerio de Sanidad), DGS Portugal.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-violet-300 font-semibold mb-1">Returnees</div>
+                UKHSA, RKI Germany, Santé publique France, BAG Switzerland, Amsterdam UMC (NOS) — monitoring contacts.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-violet-300 font-semibold mb-1">USA digital echo</div>
+                Western US DMA signal lights up May 3+ — likely media-driven public concern post WHO DON599 + CBC strain ID. Endemic CDC HPS surveillance background overlays.
+              </div>
+            </div>
+            <div className="mt-3 text-[11px] text-slate-400">
+              Disclaimer · This dashboard is for situational awareness only and is not medical advice. Case counts are tentative and may change as the outbreak develops.
+            </div>
+          </Card>
+        </section>
+
+        {/* ===== METHODOLOGY ===== */}
+        <section className="col-span-12">
+          <Card title="Methodology · Grouped Expression + Digital Epidemiology" subtitle="Breaking the 'Rural Silence' imposed by k-anonymity" glow="cyan" icon={I("scroll-text","w-4 h-4 text-cyan-300")}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm leading-relaxed text-slate-300">
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">1 · The k-anonymity problem</div>
+                Google Health Trends v1alpha suppresses query counts below threshold k, producing zeros that mask true low-volume signal in DMAs like Casper-Riverton, Grand Junction, Cheyenne.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">2 · Grouped Expressions</div>
+                Semantically equivalent expression bundles per concept ("mouse droppings" + "cleaning shed" + "deer mouse nest" + "rodent infestation home") submitted as a single probability query. Pools low-volume terms into one inferential unit, lifting them above k.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">3 · Probability, not volume</div>
+                Metric is P(query ∈ HantavirusIntent | DMA, date). Conditions out general curiosity and population mass, yielding a behaviorally meaningful prior that supports cross-DMA comparison and rural recoverability.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">4 · Trophic-cascade conditioning</div>
+                Signal interpreted under reservoir-host model: precipitation (t–12mo) → vegetation → <em>Peromyscus</em> density → human exposure semantics → clinical search intent. Filtering on Western US DMAs constrains inference to regions where the ecological prior holds.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">5 · Nielsen DMA as action layer</div>
+                DMA codes (vs counties/states) align surveillance with media-market geometry. Detected surges in DMA 790 (ABQ-Santa Fe) or 770 (Salt Lake) map directly to local broadcast / social clusters for targeted "Safe Cleaning" messaging.
+              </div>
+              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+                <div className="text-cyan-300 font-semibold mb-1">6 · From lagging to leading</div>
+                Traditional surveillance reports confirmed cases (lagging). E-BEWS pivots to behavioral probability (leading) — the actionable intervention window before clinical presentation.
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-3 text-[11px]">
+              {[
+                ["Source",         "Google Health Trends API v1alpha"],
+                ["Live overlay",   "ArcGIS FeatureServer/1 (geojson)"],
+                ["Metric",         "P(query ∈ Hantavirus intent)"],
+                ["Resolution",     `Nielsen DMA (n=${dmas.length})`],
+                ["Window",         `${dateFirst} → ${dateLast}`],
+              ].map(([k,v],i)=>(
+                <div key={i} className="bg-slate-900/60 border border-slate-800 rounded-lg p-2">
+                  <div className="text-slate-500 uppercase tracking-widest">{k}</div>
+                  <div className="text-slate-200 mono mt-1">{v}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </section>
+
+        {/* ===== COMPARISON TABLE ===== */}
+        <section className="col-span-12">
+          <Card title="Traditional Surveillance vs E-BEWS" subtitle="Why DMA-level digital epidemiology matters" glow="cyan" icon={I("table","w-4 h-4 text-cyan-300")}>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-slate-400 uppercase text-[11px] tracking-widest">
+                    <th className="text-left py-2">Feature</th>
+                    <th className="text-left py-2">Traditional Surveillance</th>
+                    <th className="text-left py-2">E-BEWS (this dashboard)</th>
+                  </tr>
+                </thead>
+                <tbody className="text-slate-200">
+                  {[
+                    ["Data Source",   "Hospital / Lab reports",            "Google Health Trends API v1alpha + ArcGIS overlay"],
+                    ["Metric",        "Confirmed cases (lagging)",         "Behavioral probabilities (leading)"],
+                    ["Resolution",    "County / State",                    "Nielsen DMA (market-specific)"],
+                    ["Privacy",       "Subject to reporting delays",       "Overcomes k-anonymity via Grouped Expressions"],
+                    ["Outcome",       "Intervention (reactive)",           "Digital Semantic Defense (predictive)"],
+                  ].map(([a,b,c],i)=>(
+                    <tr key={i} className="border-t border-slate-800/60">
+                      <td className="py-1.5 text-slate-300 mono">{a}</td>
+                      <td className="py-1.5">{b}</td>
+                      <td className="py-1.5 text-emerald-300">{c}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </section>
+
+        {/* ===== SOURCES (43 across 6 categories) ===== */}
+        <section className="col-span-12">
+          <Card title="Live Data & Sources" subtitle="43 sources across 6 categories — feeds, agencies, wires, press, science" glow="violet" icon={I("library","w-4 h-4 text-violet-300")}>
+            <div className="mb-3 text-[12px] text-slate-300">
+              <span className="mono text-violet-300">FeatureServer endpoint</span>:
+              <a className="text-cyan-300 underline break-all ml-1" target="_blank" rel="noreferrer"
+                 href="https://services1.arcgis.com/wb4Og4gH5mvzQAIV/arcgis/rest/services/Tracking_Hantavirus_2026/FeatureServer/1/query?where=1%3D1&outFields=*&f=geojson&resultRecordCount=2000">
+                /Tracking_Hantavirus_2026/FeatureServer/1/query?where=1%3D1&outFields=*&f=geojson
+              </a>
+            </div>
+            {Object.entries(SOURCES).map(([cat, items])=>(
+              <div key={cat} className="mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs uppercase tracking-widest text-violet-300">{cat}</span>
+                  <Pill color="slate">{items.length}</Pill>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+                  {items.map(([title, url, desc],i)=>(
+                    <a key={i} href={url} target="_blank" rel="noreferrer" className="src-card bg-slate-900/55 border border-slate-800 rounded-lg p-2 block">
+                      <div className="text-cyan-300 text-sm truncate">{title}</div>
+                      <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">{desc}</div>
+                      <div className="text-[10px] text-slate-500 mono mt-1 truncate">{url}</div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className="mt-4 text-[11px] text-slate-500">
+              Sister dashboard: <a className="text-cyan-300 underline" href="https://hantaviruslive.info/" target="_blank" rel="noreferrer">Hantavirus Surveillance — Global Situational Dashboard</a>.
+            </div>
+          </Card>
+        </section>
+
+        <footer className="col-span-12 text-center text-[11px] text-slate-500 py-4">
+          E-BEWS USA · data: <span className="mono">Hantavirus_DMA_Master_Merge.csv</span> ({rows.length} rows · {dmas.length} DMAs · {dates.length} days). For situational awareness only, not medical advice.
+        </footer>
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
