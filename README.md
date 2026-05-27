@@ -39,7 +39,7 @@ Or open `index.html` locally — no build, no dependencies, no Node.
 
 ## What's in the dashboard
 
-- **Animated playback engine** — virtual-time index that auto-scrubs through the data window (May 1 → May 10 in the bundled CSV). Play / pause / reset, four speeds, gradient scrubber.
+- **Animated playback engine** — virtual-time index that auto-scrubs through the data window (May 1 → May 25 in the bundled CSV). Play / pause / reset, four speeds, gradient scrubber.
 - **Live ticker** — derived from the data + the ArcGIS overlay (PEAK · SURGE · SILENCE-BREAK · WHO · CDC · ARCGIS · ECDC · PAHO).
 - **Executive cards** — Live National Σ (interpolated + count-up), national surge multiplier, most active DMA, silence-break count.
 - **Digital EKG** — national Σ time-series with a moving "NOW" reference line that sweeps as playback advances. Marks the May 1–2 rural-silence band and the peak day.
