@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>E-BEWS USA · Hantavirus Digital Epidemiology Command Center</title>
+<title>Hantavirus Digital Epidemiology Command Center · Akshaya Bhagavathula, NDSU</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -15,11 +15,11 @@
   :root { color-scheme: dark; }
   html,body { background:#020617; color:#e2e8f0; font-family: ui-sans-serif, system-ui, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-  .glow-red    { box-shadow: 0 0 24px rgba(239,68,68,.38), inset 0 0 18px rgba(239,68,68,.10); border-color: rgba(239,68,68,.55); }
-  .glow-amber  { box-shadow: 0 0 22px rgba(245,158,11,.32), inset 0 0 14px rgba(245,158,11,.09); border-color: rgba(245,158,11,.50); }
-  .glow-em     { box-shadow: 0 0 18px rgba(16,185,129,.25), inset 0 0 12px rgba(16,185,129,.06); border-color: rgba(16,185,129,.45); }
-  .glow-cyan   { box-shadow: 0 0 18px rgba(34,211,238,.25), inset 0 0 12px rgba(34,211,238,.07); border-color: rgba(34,211,238,.45); }
-  .glow-violet { box-shadow: 0 0 18px rgba(167,139,250,.22), inset 0 0 12px rgba(167,139,250,.07); border-color: rgba(167,139,250,.45); }
+  .glow-red    { box-shadow: 0 0 28px rgba(239,68,68,.50), inset 0 0 22px rgba(239,68,68,.14); border-color: rgba(239,68,68,.65); }
+  .glow-amber  { box-shadow: 0 0 26px rgba(245,158,11,.42), inset 0 0 18px rgba(245,158,11,.12); border-color: rgba(245,158,11,.60); }
+  .glow-em     { box-shadow: 0 0 22px rgba(16,185,129,.34), inset 0 0 16px rgba(16,185,129,.09); border-color: rgba(16,185,129,.55); }
+  .glow-cyan   { box-shadow: 0 0 22px rgba(34,211,238,.35), inset 0 0 16px rgba(34,211,238,.10); border-color: rgba(34,211,238,.55); }
+  .glow-violet { box-shadow: 0 0 22px rgba(167,139,250,.34), inset 0 0 16px rgba(167,139,250,.10); border-color: rgba(167,139,250,.55); }
   .grid-bg {
     background-image:
       linear-gradient(rgba(148,163,184,.06) 1px, transparent 1px),
@@ -57,10 +57,44 @@
   .scrollx { overflow-x: auto; }
   .btn-ghost { background: rgba(15,23,42,.6); border: 1px solid #334155; color:#cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 11px; }
   .btn-ghost:hover { background: rgba(30,41,59,.8); color:#fff; }
-  .btn-ghost[data-active="true"] { color:#f59e0b; border-color: rgba(245,158,11,.5); background: rgba(245,158,11,.1); }
-  .scrubber { -webkit-appearance:none; appearance:none; height:6px; background: linear-gradient(90deg,#0ea5e9,#ef4444); border-radius: 9999px; }
-  .scrubber::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:14px; height:14px; border-radius:9999px; background:#fde68a; box-shadow: 0 0 8px rgba(253,230,138,.8); cursor: pointer; }
-  .scrubber::-moz-range-thumb { width:14px; height:14px; border-radius:9999px; background:#fde68a; box-shadow: 0 0 8px rgba(253,230,138,.8); cursor: pointer; }
+  .btn-ghost[data-active="true"] { color:#19553C; border-color: rgba(255,200,46,.7); background: rgba(255,200,46,.9); font-weight: 700; }
+  .scrubber { -webkit-appearance:none; appearance:none; height:6px; background: linear-gradient(90deg, var(--ndsu-green) 0%, var(--ndsu-green-2) 40%, var(--ndsu-gold) 100%); border-radius: 9999px; }
+  .scrubber::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:16px; height:16px; border-radius:9999px; background: var(--ndsu-gold); box-shadow: 0 0 10px rgba(255,200,46,.9); cursor: pointer; border: 2px solid var(--ndsu-green); }
+  .scrubber::-moz-range-thumb { width:16px; height:16px; border-radius:9999px; background: var(--ndsu-gold); box-shadow: 0 0 10px rgba(255,200,46,.9); cursor: pointer; border: 2px solid var(--ndsu-green); }
+
+  /* === NDSU brand palette ============================================== */
+  /* Bison Green #19553C · Field Yellow #FFC82E · Heritage Gray #828A8F   */
+  :root{
+    --ndsu-green:   #19553C;
+    --ndsu-green-2: #2d8556;
+    --ndsu-green-3: #4ade80;
+    --ndsu-gold:    #FFC82E;
+    --ndsu-gold-2:  #ffd966;
+    --ndsu-gray:    #828A8F;
+  }
+  .ndsu-band {
+    height: 4px;
+    background: linear-gradient(90deg, var(--ndsu-green) 0%, var(--ndsu-green-2) 35%, var(--ndsu-gold) 65%, var(--ndsu-gold-2) 100%);
+    box-shadow: 0 4px 18px rgba(255,200,46,.18);
+  }
+  .ndsu-pill {
+    background: linear-gradient(90deg, rgba(25,85,60,.25), rgba(255,200,46,.18));
+    border: 1px solid rgba(255,200,46,.45);
+    color: #fef3c7;
+  }
+  .glow-ndsu  { box-shadow: 0 0 24px rgba(25,85,60,.55), inset 0 0 22px rgba(255,200,46,.12); border-color: rgba(255,200,46,.55); }
+  .text-ndsu-green { color: var(--ndsu-green-3); }
+  .text-ndsu-gold  { color: var(--ndsu-gold); }
+  .border-ndsu     { border-color: rgba(255,200,46,.45); }
+  .bg-ndsu-green-soft { background: rgba(25,85,60,.18); }
+  .bg-ndsu-gold-soft  { background: rgba(255,200,46,.12); }
+  /* NDSU primary buttons use gold-on-green */
+  .btn-ndsu { background: var(--ndsu-green); color: var(--ndsu-gold); border: 1px solid var(--ndsu-gold); border-radius: 6px; padding: 4px 10px; font-size: 11px; }
+  .btn-ndsu:hover { background: var(--ndsu-green-2); }
+  /* Override pulse-dot to NDSU gold */
+  .pulse-dot::after { background: var(--ndsu-gold); box-shadow: 0 0 0 0 rgba(255,200,46,.55); }
+  @keyframes pulse-gold { 0%{box-shadow:0 0 0 0 rgba(255,200,46,.55);} 70%{box-shadow:0 0 0 12px rgba(255,200,46,0);} 100%{box-shadow:0 0 0 0 rgba(255,200,46,0);} }
+  .pulse-dot::after { animation: pulse-gold 1.6s infinite; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -74,9 +108,13 @@ const {
 } = Recharts;
 
 /* =============================================================================
-   E-BEWS USA — Hantavirus Digital Epidemiology Command Center
+   Hantavirus Digital Epidemiology Command Center
+   Akshaya Bhagavathula, PhD FACE — Professor of Epidemiology,
+   Department of Public Health, North Dakota State University, Fargo, ND USA
+   https://www.ndsu.edu/people/akshaya-bhagavathula
+
    Data source: Hantavirus_DMA_Master_Merge.csv (Google Health Trends API,
-                v1alpha · Western US DMAs · 2026-05-01 → 2026-05-10)
+                v1alpha · Western US DMAs · 2026-05-01 → 2026-05-25)
    Live overlay: ArcGIS FeatureServer (Tracking_Hantavirus_2026/1)
    Methodology: Grouped Expression queries to defeat k-anonymity in rural DMAs.
 ============================================================================= */
@@ -132,416 +170,1031 @@ const DMA_LOOKUP = {
 
 // ------------------- Inline CSV (verbatim from Hantavirus_DMA_Master_Merge.csv) --
 const CSV = `Date,SearchInterest,DMA,Term
-2026-05-01,172.46413842693283,Albuquerque-Santa,hantavirus
-2026-05-01,0.0,Amarillo,hantavirus
-2026-05-01,0.0,Bakersfield,hantavirus
-2026-05-01,0.0,Bend,hantavirus
-2026-05-01,0.0,Billings,hantavirus
-2026-05-01,0.0,Boise,hantavirus
-2026-05-01,0.0,Butte-Bozeman,hantavirus
-2026-05-01,0.0,Casper-Riverton,hantavirus
-2026-05-01,0.0,Cheyenne,hantavirus
-2026-05-01,0.0,Chico-Redding,hantavirus
-2026-05-01,0.0,Colorado,hantavirus
-2026-05-01,50.65147924942691,Denver,hantavirus
-2026-05-01,0.0,El,hantavirus
-2026-05-01,0.0,Eugene,hantavirus
-2026-05-01,0.0,Fargo-Valley,hantavirus
-2026-05-01,0.0,Fresno-Visalia,hantavirus
-2026-05-01,0.0,Grand,hantavirus
-2026-05-01,0.0,Great,hantavirus
-2026-05-01,0.0,Idaho,hantavirus
-2026-05-01,0.0,Las,hantavirus
-2026-05-01,30.371869739879077,Los,hantavirus
-2026-05-01,0.0,Lubbock,hantavirus
-2026-05-01,0.0,Medford-Klamath,hantavirus
-2026-05-01,0.0,Minot-Bismarck-Dickinson(Williston),hantavirus
-2026-05-01,0.0,Missoula,hantavirus
-2026-05-01,0.0,Odessa-Midland,hantavirus
-2026-05-01,37.22715541125972,Phoenix,hantavirus
-2026-05-01,59.22271738494221,Portland,hantavirus
-2026-05-01,0.0,Rapid,hantavirus
-2026-05-01,0.0,Reno,hantavirus
-2026-05-01,0.0,Sacramento-Stockton-Modesto,hantavirus
-2026-05-01,0.0,Salt,hantavirus
-2026-05-01,0.0,San,hantavirus
-2026-05-01,35.58757944035054,San,hantavirus
-2026-05-01,0.0,Seattle-Tacoma,hantavirus
-2026-05-01,0.0,Sioux,hantavirus
-2026-05-01,0.0,Spokane,hantavirus
-2026-05-01,0.0,Tucson,hantavirus
-2026-05-01,0.0,Twin,hantavirus
-2026-05-01,0.0,Yakima-Pasco-Richland-Kennewick,hantavirus
-2026-05-01,0.0,Yuma,hantavirus
-2026-05-02,265.1150168146013,Albuquerque-Santa,hantavirus
-2026-05-02,0.0,Amarillo,hantavirus
-2026-05-02,0.0,Bakersfield,hantavirus
-2026-05-02,0.0,Bend,hantavirus
-2026-05-02,0.0,Billings,hantavirus
-2026-05-02,0.0,Boise,hantavirus
-2026-05-02,0.0,Butte-Bozeman,hantavirus
-2026-05-02,0.0,Casper-Riverton,hantavirus
-2026-05-02,0.0,Cheyenne,hantavirus
-2026-05-02,0.0,Chico-Redding,hantavirus
-2026-05-02,0.0,Colorado,hantavirus
-2026-05-02,25.545811570292837,Denver,hantavirus
-2026-05-02,0.0,El,hantavirus
-2026-05-02,0.0,Eugene,hantavirus
-2026-05-02,0.0,Fargo-Valley,hantavirus
-2026-05-02,190.347053809968,Fresno-Visalia,hantavirus
-2026-05-02,0.0,Grand,hantavirus
-2026-05-02,0.0,Great,hantavirus
-2026-05-02,0.0,Idaho,hantavirus
-2026-05-02,0.0,Las,hantavirus
-2026-05-02,24.85326931317063,Los,hantavirus
-2026-05-02,0.0,Lubbock,hantavirus
-2026-05-02,0.0,Medford-Klamath,hantavirus
-2026-05-02,0.0,Minot-Bismarck-Dickinson(Williston),hantavirus
-2026-05-02,0.0,Missoula,hantavirus
-2026-05-02,0.0,Odessa-Midland,hantavirus
-2026-05-02,0.0,Phoenix,hantavirus
-2026-05-02,102.70550875188424,Portland,hantavirus
-2026-05-02,0.0,Rapid,hantavirus
-2026-05-02,0.0,Reno,hantavirus
-2026-05-02,81.25933811544174,Sacramento-Stockton-Modesto,hantavirus
-2026-05-02,0.0,Salt,hantavirus
-2026-05-02,0.0,San,hantavirus
-2026-05-02,68.12800618291018,San,hantavirus
-2026-05-02,37.08583370798132,Seattle-Tacoma,hantavirus
-2026-05-02,0.0,Sioux,hantavirus
-2026-05-02,0.0,Spokane,hantavirus
-2026-05-02,0.0,Tucson,hantavirus
-2026-05-02,0.0,Twin,hantavirus
-2026-05-02,0.0,Yakima-Pasco-Richland-Kennewick,hantavirus
-2026-05-02,0.0,Yuma,hantavirus
-2026-05-03,1762.9366713996276,Albuquerque-Santa,hantavirus
-2026-05-03,1951.0772887507276,Amarillo,hantavirus
-2026-05-03,966.57064977126,Bakersfield,hantavirus
-2026-05-03,1318.6763131929697,Bend,hantavirus
-2026-05-03,2775.0742771014,Billings,hantavirus
-2026-05-03,2263.74552076282,Boise,hantavirus
-2026-05-03,2397.689325874592,Butte-Bozeman,hantavirus
-2026-05-03,0.0,Casper-Riverton,hantavirus
-2026-05-03,0.0,Cheyenne,hantavirus
-2026-05-03,1913.4705690336696,Chico-Redding,hantavirus
-2026-05-03,1525.1408198410036,Colorado,hantavirus
-2026-05-03,1413.0538964057357,Denver,hantavirus
-2026-05-03,977.8286633281826,El,hantavirus
-2026-05-03,2268.614093176492,Eugene,hantavirus
-2026-05-03,1215.8038055428551,Fargo-Valley,hantavirus
-2026-05-03,964.5572830221043,Fresno-Visalia,hantavirus
-2026-05-03,0.0,Grand,hantavirus
-2026-05-03,0.0,Great,hantavirus
-2026-05-03,1005.148627559188,Idaho,hantavirus
-2026-05-03,1657.3261860433977,Las,hantavirus
-2026-05-03,1801.301563314037,Los,hantavirus
-2026-05-03,1264.380250227119,Lubbock,hantavirus
-2026-05-03,1088.0448668549282,Medford-Klamath,hantavirus
-2026-05-03,0.0,Minot-Bismarck-Dickinson(Williston),hantavirus
-2026-05-03,0.0,Missoula,hantavirus
-2026-05-03,1449.6193031844778,Odessa-Midland,hantavirus
-2026-05-03,1582.8268091300936,Phoenix,hantavirus
-2026-05-03,2649.805899931381,Portland,hantavirus
-2026-05-03,0.0,Rapid,hantavirus
-2026-05-03,1758.254977483724,Reno,hantavirus
-2026-05-03,1616.681695620545,Sacramento-Stockton-Modesto,hantavirus
-2026-05-03,1681.635865126107,Salt,hantavirus
-2026-05-03,2257.289995607785,San,hantavirus
-2026-05-03,2926.3876778228764,San,hantavirus
-2026-05-03,2459.9290489936934,Seattle-Tacoma,hantavirus
-2026-05-03,1241.2076573781758,Sioux,hantavirus
-2026-05-03,1506.1134258591535,Spokane,hantavirus
-2026-05-03,2123.9811359681107,Tucson,hantavirus
-2026-05-03,1966.0717556924224,Twin,hantavirus
-2026-05-03,1334.01533258551,Yakima-Pasco-Richland-Kennewick,hantavirus
-2026-05-03,840.4681086474906,Yuma,hantavirus
-2026-05-04,9006.034416126939,Albuquerque-Santa,hantavirus
-2026-05-04,10928.26435797746,Amarillo,hantavirus
-2026-05-04,7650.813998242161,Bakersfield,hantavirus
-2026-05-04,9271.833202615406,Bend,hantavirus
-2026-05-04,14482.611299523543,Billings,hantavirus
-2026-05-04,10135.778481574403,Boise,hantavirus
-2026-05-04,9855.24021884446,Butte-Bozeman,hantavirus
-2026-05-04,6393.058296471468,Casper-Riverton,hantavirus
-2026-05-04,3536.821755686379,Cheyenne,hantavirus
-2026-05-04,9617.07772488106,Chico-Redding,hantavirus
-2026-05-04,10183.94071601598,Colorado,hantavirus
-2026-05-04,7054.502015311024,Denver,hantavirus
-2026-05-04,8028.5308057895745,El,hantavirus
-2026-05-04,10561.491123828182,Eugene,hantavirus
-2026-05-04,9380.98851094231,Fargo-Valley,hantavirus
-2026-05-04,7661.106084410615,Fresno-Visalia,hantavirus
-2026-05-04,8190.082791072391,Grand,hantavirus
-2026-05-04,7264.793751600513,Great,hantavirus
-2026-05-04,7812.613100036611,Idaho,hantavirus
-2026-05-04,9780.110842024656,Las,hantavirus
-2026-05-04,10507.631481002452,Los,hantavirus
-2026-05-04,9442.999605127468,Lubbock,hantavirus
-2026-05-04,8950.493090400656,Medford-Klamath,hantavirus
-2026-05-04,8489.811795234327,Minot-Bismarck-Dickinson(Williston),hantavirus
-2026-05-04,7089.187757434866,Missoula,hantavirus
-2026-05-04,10186.06401788779,Odessa-Midland,hantavirus
-2026-05-04,11860.310386435158,Phoenix,hantavirus
-2026-05-04,10972.830901016345,Portland,hantavirus
-2026-05-04,10012.842985701353,Rapid,hantavirus
-2026-05-04,8462.926872756527,Reno,hantavirus
-2026-05-04,9358.361023549827,Sacramento-Stockton-Modesto,hantavirus
-2026-05-04,9362.921936892,Salt,hantavirus
-2026-05-04,11590.564609398716,San,hantavirus
-2026-05-04,10666.703396015904,San,hantavirus
-2026-05-04,11898.830057255363,Seattle-Tacoma,hantavirus
-2026-05-04,8902.240397022382,Sioux,hantavirus
-2026-05-04,9467.01669461523,Spokane,hantavirus
-2026-05-04,10973.978181877656,Tucson,hantavirus
-2026-05-04,6295.328919429545,Twin,hantavirus
-2026-05-04,6955.697843425291,Yakima-Pasco-Richland-Kennewick,hantavirus
-2026-05-04,7296.495482282885,Yuma,hantavirus
-2026-05-05,10564.440000674198,Albuquerque-Santa,hantavirus
-2026-05-05,14600.703746227611,Amarillo,hantavirus
-2026-05-05,11825.454415964285,Bakersfield,hantavirus
-2026-05-05,12762.288980522306,Bend,hantavirus
-2026-05-05,15716.19560437397,Billings,hantavirus
-2026-05-05,12092.110954828497,Boise,hantavirus
-2026-05-05,11160.907433419205,Butte-Bozeman,hantavirus
-2026-05-05,11495.800074423,Casper-Riverton,hantavirus
-2026-05-05,5879.009910737139,Cheyenne,hantavirus
-2026-05-05,10961.601102877745,Chico-Redding,hantavirus
-2026-05-05,14692.86436228527,Colorado,hantavirus
-2026-05-05,8509.445460123448,Denver,hantavirus
-2026-05-05,10710.138104090887,El,hantavirus
-2026-05-05,12246.099571835592,Eugene,hantavirus
-2026-05-05,12038.031847370648,Fargo-Valley,hantavirus
-2026-05-05,10843.817660818091,Fresno-Visalia,hantavirus
-2026-05-05,9281.166248417574,Grand,hantavirus
-2026-05-05,10552.239865537418,Great,hantavirus
-2026-05-05,9036.36950679802,Idaho,hantavirus
-2026-05-05,13180.978669587634,Las,hantavirus
-2026-05-05,12803.52027550021,Los,hantavirus
-2026-05-05,11843.29006084334,Lubbock,hantavirus
-2026-05-05,12399.488174098162,Medford-Klamath,hantavirus
-2026-05-05,10449.998906305897,Minot-Bismarck-Dickinson(Williston),hantavirus
-2026-05-05,10266.664518447546,Missoula,hantavirus
-2026-05-05,11791.486343101284,Odessa-Midland,hantavirus
-2026-05-05,13180.25524424135,Phoenix,hantavirus
-2026-05-05,13869.49590497933,Portland,hantavirus
-2026-05-05,13021.47588178455,Rapid,hantavirus
-2026-05-05,10385.996425300937,Reno,hantavirus
-2026-05-05,11935.932873470849,Sacramento-Stockton-Modesto,hantavirus
-2026-05-05,11738.56915657996,Salt,hantavirus
-2026-05-05,13849.597241674672,San,hantavirus
-2026-05-05,12116.717988834786,San,hantavirus
-2026-05-05,13623.44698881115,Seattle-Tacoma,hantavirus
-2026-05-05,12346.320397788148,Sioux,hantavirus
-2026-05-05,11360.85942392683,Spokane,hantavirus
-2026-05-05,12706.008582938157,Tucson,hantavirus
-2026-05-05,10740.66508520869,Twin,hantavirus
-2026-05-05,10542.183440428458,Yakima-Pasco-Richland-Kennewick,hantavirus
-2026-05-05,11381.100750992558,Yuma,hantavirus
-2026-05-06,20023.17697720674,Albuquerque-Santa,hantavirus
-2026-05-06,30140.366986956426,Amarillo,hantavirus
-2026-05-06,22409.822774199256,Bakersfield,hantavirus
-2026-05-06,21684.18979122485,Bend,hantavirus
-2026-05-06,31903.41559467045,Billings,hantavirus
-2026-05-06,23319.497601612657,Boise,hantavirus
-2026-05-06,23680.46318677027,Butte-Bozeman,hantavirus
-2026-05-06,22500.05001579489,Casper-Riverton,hantavirus
-2026-05-06,10052.833630728346,Cheyenne,hantavirus
-2026-05-06,21139.54377257644,Chico-Redding,hantavirus
-2026-05-06,25434.73639828457,Colorado,hantavirus
-2026-05-06,16175.05105778795,Denver,hantavirus
-2026-05-06,22625.63128165109,El,hantavirus
-2026-05-06,26004.642223820505,Eugene,hantavirus
-2026-05-06,26943.461579014507,Fargo-Valley,hantavirus
-2026-05-06,20655.27869108426,Fresno-Visalia,hantavirus
-2026-05-06,18993.651848053825,Grand,hantavirus
-2026-05-06,20959.15317414681,Great,hantavirus
-2026-05-06,18852.24335845922,Idaho,hantavirus
-2026-05-06,23329.48645365413,Las,hantavirus
-2026-05-06,23209.47781315222,Los,hantavirus
-2026-05-06,29623.05353903639,Lubbock,hantavirus
-2026-05-06,21467.09159840341,Medford-Klamath,hantavirus
-2026-05-06,21570.65831323812,Minot-Bismarck-Dickinson(Williston),hantavirus
-2026-05-06,17426.508192763446,Missoula,hantavirus
-2026-05-06,25807.524900184937,Odessa-Midland,hantavirus
-2026-05-06,24381.9371180491,Phoenix,hantavirus
-2026-05-06,25673.75874191812,Portland,hantavirus
-2026-05-06,22275.668273300707,Rapid,hantavirus
-2026-05-06,20602.45568994713,Reno,hantavirus
-2026-05-06,22305.82011739832,Sacramento-Stockton-Modesto,hantavirus
-2026-05-06,22891.70496170184,Salt,hantavirus
-2026-05-06,25840.22705838541,San,hantavirus
-2026-05-06,22144.69123123844,San,hantavirus
-2026-05-06,25835.52195941892,Seattle-Tacoma,hantavirus
-2026-05-06,26315.688143545056,Sioux,hantavirus
-2026-05-06,22857.27934176544,Spokane,hantavirus
-2026-05-06,24938.43962636599,Tucson,hantavirus
-2026-05-06,16745.39795054185,Twin,hantavirus
-2026-05-06,22028.47423269596,Yakima-Pasco-Richland-Kennewick,hantavirus
-2026-05-06,21633.245078318865,Yuma,hantavirus
-2026-05-07,43817.5691622519,Albuquerque-Santa,hantavirus
-2026-05-07,55484.3473733168,Amarillo,hantavirus
-2026-05-07,49671.30450012896,Bakersfield,hantavirus
-2026-05-07,52446.45455171123,Bend,hantavirus
-2026-05-07,54279.09972607299,Billings,hantavirus
-2026-05-07,47966.717166548,Boise,hantavirus
-2026-05-07,51326.456131373554,Butte-Bozeman,hantavirus
-2026-05-07,38289.60127739328,Casper-Riverton,hantavirus
-2026-05-07,18717.307119826568,Cheyenne,hantavirus
-2026-05-07,49720.24464076514,Chico-Redding,hantavirus
-2026-05-07,52823.97780178742,Colorado,hantavirus
-2026-05-07,33661.86677983814,Denver,hantavirus
-2026-05-07,53274.497218655175,El,hantavirus
-2026-05-07,55311.00913603616,Eugene,hantavirus
-2026-05-07,48318.96821446524,Fargo-Valley,hantavirus
-2026-05-07,50658.84638575907,Fresno-Visalia,hantavirus
-2026-05-07,42059.09846616242,Grand,hantavirus
-2026-05-07,42556.11106560039,Great,hantavirus
-2026-05-07,44587.562895873256,Idaho,hantavirus
-2026-05-07,50726.13478473391,Las,hantavirus
-2026-05-07,52313.17966139688,Los,hantavirus
-2026-05-07,66391.05927193938,Lubbock,hantavirus
-2026-05-07,47309.28885157185,Medford-Klamath,hantavirus
-2026-05-07,47638.319551844994,Minot-Bismarck-Dickinson(Williston),hantavirus
-2026-05-07,46784.02357570467,Missoula,hantavirus
-2026-05-07,51026.60513766377,Odessa-Midland,hantavirus
-2026-05-07,65699.76826936123,Phoenix,hantavirus
-2026-05-07,52747.731014600926,Portland,hantavirus
-2026-05-07,46913.81803590885,Rapid,hantavirus
-2026-05-07,48754.82002886512,Reno,hantavirus
-2026-05-07,49344.92049316814,Sacramento-Stockton-Modesto,hantavirus
-2026-05-07,49618.33671281209,Salt,hantavirus
-2026-05-07,58706.91667657632,San,hantavirus
-2026-05-07,51034.13691312783,San,hantavirus
-2026-05-07,51238.30846042457,Seattle-Tacoma,hantavirus
-2026-05-07,50164.16071717016,Sioux,hantavirus
-2026-05-07,49803.39932829744,Spokane,hantavirus
-2026-05-07,62328.32785643906,Tucson,hantavirus
-2026-05-07,40855.0756367321,Twin,hantavirus
-2026-05-07,50029.593380206425,Yakima-Pasco-Richland-Kennewick,hantavirus
-2026-05-07,53446.983038131024,Yuma,hantavirus
-2026-05-08,42312.813864234464,Albuquerque-Santa,hantavirus
-2026-05-08,48886.006596507286,Amarillo,hantavirus
-2026-05-08,50102.84935849159,Bakersfield,hantavirus
-2026-05-08,57382.73127515333,Bend,hantavirus
-2026-05-08,47116.957286133584,Billings,hantavirus
-2026-05-08,48071.82684983543,Boise,hantavirus
-2026-05-08,45947.043212984805,Butte-Bozeman,hantavirus
-2026-05-08,47940.49937037041,Casper-Riverton,hantavirus
-2026-05-08,20228.94891070725,Cheyenne,hantavirus
-2026-05-08,45580.45880575382,Chico-Redding,hantavirus
-2026-05-08,49181.92025901561,Colorado,hantavirus
-2026-05-08,28354.282139728453,Denver,hantavirus
-2026-05-08,47681.83282698471,El,hantavirus
-2026-05-08,49440.16987286997,Eugene,hantavirus
-2026-05-08,46134.038225988574,Fargo-Valley,hantavirus
-2026-05-08,51164.80369413994,Fresno-Visalia,hantavirus
-2026-05-08,38314.079795400445,Grand,hantavirus
-2026-05-08,41816.839387186046,Great,hantavirus
-2026-05-08,45763.23992213898,Idaho,hantavirus
-2026-05-08,47140.391705816415,Las,hantavirus
-2026-05-08,47888.42043401375,Los,hantavirus
-2026-05-08,49054.22099578388,Lubbock,hantavirus
-2026-05-08,46168.44587578271,Medford-Klamath,hantavirus
-2026-05-08,48303.12744620298,Minot-Bismarck-Dickinson(Williston),hantavirus
-2026-05-08,43201.81852234736,Missoula,hantavirus
-2026-05-08,47283.13308129608,Odessa-Midland,hantavirus
-2026-05-08,57510.36169216408,Phoenix,hantavirus
-2026-05-08,49744.79918484622,Portland,hantavirus
-2026-05-08,46549.5703501246,Rapid,hantavirus
-2026-05-08,50244.68223398912,Reno,hantavirus
-2026-05-08,47406.697447571605,Sacramento-Stockton-Modesto,hantavirus
-2026-05-08,45760.15040073359,Salt,hantavirus
-2026-05-08,49523.56864371058,San,hantavirus
-2026-05-08,46539.058223699496,San,hantavirus
-2026-05-08,47832.715608038176,Seattle-Tacoma,hantavirus
-2026-05-08,47124.34767164283,Sioux,hantavirus
-2026-05-08,44844.41167653797,Spokane,hantavirus
-2026-05-08,55427.28890929831,Tucson,hantavirus
-2026-05-08,42690.90394548137,Twin,hantavirus
-2026-05-08,45593.73924175326,Yakima-Pasco-Richland-Kennewick,hantavirus
-2026-05-08,54616.13900493199,Yuma,hantavirus
-2026-05-09,27314.056873346213,Albuquerque-Santa,hantavirus
-2026-05-09,30203.174724292985,Amarillo,hantavirus
-2026-05-09,32900.16118923921,Bakersfield,hantavirus
-2026-05-09,32404.94857832632,Bend,hantavirus
-2026-05-09,29496.95003145788,Billings,hantavirus
-2026-05-09,29117.013805153536,Boise,hantavirus
-2026-05-09,29311.00311870507,Butte-Bozeman,hantavirus
-2026-05-09,28084.86300834864,Casper-Riverton,hantavirus
-2026-05-09,15575.132468718855,Cheyenne,hantavirus
-2026-05-09,26088.191818343224,Chico-Redding,hantavirus
-2026-05-09,33858.07764942458,Colorado,hantavirus
-2026-05-09,18259.01225894984,Denver,hantavirus
-2026-05-09,30683.546623904203,El,hantavirus
-2026-05-09,31818.671148575904,Eugene,hantavirus
-2026-05-09,27037.47897975404,Fargo-Valley,hantavirus
-2026-05-09,42107.69265923118,Fresno-Visalia,hantavirus
-2026-05-09,25294.81743892235,Grand,hantavirus
-2026-05-09,26587.02181794996,Great,hantavirus
-2026-05-09,29675.904448024605,Idaho,hantavirus
-2026-05-09,28795.750995003204,Las,hantavirus
-2026-05-09,29396.318086277428,Los,hantavirus
-2026-05-09,28703.403814698137,Lubbock,hantavirus
-2026-05-09,31169.098894863928,Medford-Klamath,hantavirus
-2026-05-09,31937.2407813658,Minot-Bismarck-Dickinson(Williston),hantavirus
-2026-05-09,28540.39813913052,Missoula,hantavirus
-2026-05-09,26575.01614187354,Odessa-Midland,hantavirus
-2026-05-09,33168.26254940411,Phoenix,hantavirus
-2026-05-09,31390.235955634143,Portland,hantavirus
-2026-05-09,35442.79495298409,Rapid,hantavirus
-2026-05-09,34045.52912354478,Reno,hantavirus
-2026-05-09,30018.20899601197,Sacramento-Stockton-Modesto,hantavirus
-2026-05-09,34415.91999669213,Salt,hantavirus
-2026-05-09,31132.858912448934,San,hantavirus
-2026-05-09,29901.66621991299,San,hantavirus
-2026-05-09,30340.485165867125,Seattle-Tacoma,hantavirus
-2026-05-09,33784.838737794824,Sioux,hantavirus
-2026-05-09,29575.05246397039,Spokane,hantavirus
-2026-05-09,33611.98099041126,Tucson,hantavirus
-2026-05-09,28456.3123707534,Twin,hantavirus
-2026-05-09,28559.031386671977,Yakima-Pasco-Richland-Kennewick,hantavirus
-2026-05-09,29991.40396866592,Yuma,hantavirus
-2026-05-10,19843.786204511303,Albuquerque-Santa,hantavirus
-2026-05-10,20378.03487273545,Amarillo,hantavirus
-2026-05-10,24340.48427901362,Bakersfield,hantavirus
-2026-05-10,25263.013325253967,Bend,hantavirus
-2026-05-10,22404.756521353145,Billings,hantavirus
-2026-05-10,21642.302644730684,Boise,hantavirus
-2026-05-10,23507.84603410689,Butte-Bozeman,hantavirus
-2026-05-10,21050.224248449435,Casper-Riverton,hantavirus
-2026-05-10,10548.164965079044,Cheyenne,hantavirus
-2026-05-10,21082.17524080929,Chico-Redding,hantavirus
-2026-05-10,23833.939265946257,Colorado,hantavirus
-2026-05-10,13387.704522856968,Denver,hantavirus
-2026-05-10,20720.523653622644,El,hantavirus
-2026-05-10,21968.73239997844,Eugene,hantavirus
-2026-05-10,22211.980436698886,Fargo-Valley,hantavirus
-2026-05-10,27640.388491789705,Fresno-Visalia,hantavirus
-2026-05-10,19550.94660944425,Grand,hantavirus
-2026-05-10,22634.232648685647,Great,hantavirus
-2026-05-10,22667.91788293716,Idaho,hantavirus
-2026-05-10,21475.059487172704,Las,hantavirus
-2026-05-10,21490.958631870468,Los,hantavirus
-2026-05-10,19153.782415569745,Lubbock,hantavirus
-2026-05-10,22042.2866936952,Medford-Klamath,hantavirus
-2026-05-10,21344.599068235428,Minot-Bismarck-Dickinson(Williston),hantavirus
-2026-05-10,18538.158405439197,Missoula,hantavirus
-2026-05-10,19358.54653290466,Odessa-Midland,hantavirus
-2026-05-10,22507.256147268465,Phoenix,hantavirus
-2026-05-10,22306.208106242804,Portland,hantavirus
-2026-05-10,20937.974931301364,Rapid,hantavirus
-2026-05-10,21582.30193694731,Reno,hantavirus
-2026-05-10,21612.49460803412,Sacramento-Stockton-Modesto,hantavirus
-2026-05-10,23690.89088995868,Salt,hantavirus
-2026-05-10,22925.14375370673,San,hantavirus
-2026-05-10,23565.189117884544,San,hantavirus
-2026-05-10,21733.189144066,Seattle-Tacoma,hantavirus
-2026-05-10,24440.83630764852,Sioux,hantavirus
-2026-05-10,21810.516524634117,Spokane,hantavirus
-2026-05-10,21610.858885529557,Tucson,hantavirus
-2026-05-10,19455.52395443687,Twin,hantavirus
-2026-05-10,18845.04601658232,Yakima-Pasco-Richland-Kennewick,hantavirus
-2026-05-10,19917.69652280088,Yuma,hantavirus`;
+2026-05-01,172.464138,Albuquerque-Santa,hantavirus
+2026-05-01,0,Amarillo,hantavirus
+2026-05-01,0,Bakersfield,hantavirus
+2026-05-01,0,Bend,hantavirus
+2026-05-01,0,Billings,hantavirus
+2026-05-01,0,Boise,hantavirus
+2026-05-01,0,Butte-Bozeman,hantavirus
+2026-05-01,0,Casper-Riverton,hantavirus
+2026-05-01,0,Cheyenne,hantavirus
+2026-05-01,0,Chico-Redding,hantavirus
+2026-05-01,0,Colorado,hantavirus
+2026-05-01,50.651479,Denver,hantavirus
+2026-05-01,0,El,hantavirus
+2026-05-01,0,Eugene,hantavirus
+2026-05-01,0,Fargo-Valley,hantavirus
+2026-05-01,0,Fresno-Visalia,hantavirus
+2026-05-01,0,Grand,hantavirus
+2026-05-01,0,Great,hantavirus
+2026-05-01,0,Idaho,hantavirus
+2026-05-01,0,Las,hantavirus
+2026-05-01,30.37187,Los,hantavirus
+2026-05-01,0,Lubbock,hantavirus
+2026-05-01,0,Medford-Klamath,hantavirus
+2026-05-01,0,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-01,0,Missoula,hantavirus
+2026-05-01,0,Odessa-Midland,hantavirus
+2026-05-01,37.227155,Phoenix,hantavirus
+2026-05-01,59.222717,Portland,hantavirus
+2026-05-01,0,Rapid,hantavirus
+2026-05-01,0,Reno,hantavirus
+2026-05-01,0,Sacramento-Stockton-Modesto,hantavirus
+2026-05-01,0,Salt,hantavirus
+2026-05-01,0,San,hantavirus
+2026-05-01,35.587579,San,hantavirus
+2026-05-01,0,Seattle-Tacoma,hantavirus
+2026-05-01,0,Sioux,hantavirus
+2026-05-01,0,Spokane,hantavirus
+2026-05-01,0,Tucson,hantavirus
+2026-05-01,0,Twin,hantavirus
+2026-05-01,0,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-01,0,Yuma,hantavirus
+2026-05-02,265.115017,Albuquerque-Santa,hantavirus
+2026-05-02,0,Amarillo,hantavirus
+2026-05-02,0,Bakersfield,hantavirus
+2026-05-02,0,Bend,hantavirus
+2026-05-02,0,Billings,hantavirus
+2026-05-02,0,Boise,hantavirus
+2026-05-02,0,Butte-Bozeman,hantavirus
+2026-05-02,0,Casper-Riverton,hantavirus
+2026-05-02,0,Cheyenne,hantavirus
+2026-05-02,0,Chico-Redding,hantavirus
+2026-05-02,0,Colorado,hantavirus
+2026-05-02,25.545812,Denver,hantavirus
+2026-05-02,0,El,hantavirus
+2026-05-02,0,Eugene,hantavirus
+2026-05-02,0,Fargo-Valley,hantavirus
+2026-05-02,190.347054,Fresno-Visalia,hantavirus
+2026-05-02,0,Grand,hantavirus
+2026-05-02,0,Great,hantavirus
+2026-05-02,0,Idaho,hantavirus
+2026-05-02,0,Las,hantavirus
+2026-05-02,24.853269,Los,hantavirus
+2026-05-02,0,Lubbock,hantavirus
+2026-05-02,0,Medford-Klamath,hantavirus
+2026-05-02,0,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-02,0,Missoula,hantavirus
+2026-05-02,0,Odessa-Midland,hantavirus
+2026-05-02,0,Phoenix,hantavirus
+2026-05-02,102.705509,Portland,hantavirus
+2026-05-02,0,Rapid,hantavirus
+2026-05-02,0,Reno,hantavirus
+2026-05-02,81.259338,Sacramento-Stockton-Modesto,hantavirus
+2026-05-02,0,Salt,hantavirus
+2026-05-02,0,San,hantavirus
+2026-05-02,68.128006,San,hantavirus
+2026-05-02,37.085834,Seattle-Tacoma,hantavirus
+2026-05-02,0,Sioux,hantavirus
+2026-05-02,0,Spokane,hantavirus
+2026-05-02,0,Tucson,hantavirus
+2026-05-02,0,Twin,hantavirus
+2026-05-02,0,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-02,0,Yuma,hantavirus
+2026-05-03,1762.936671,Albuquerque-Santa,hantavirus
+2026-05-03,1951.077289,Amarillo,hantavirus
+2026-05-03,966.57065,Bakersfield,hantavirus
+2026-05-03,1318.676313,Bend,hantavirus
+2026-05-03,2775.074277,Billings,hantavirus
+2026-05-03,2263.745521,Boise,hantavirus
+2026-05-03,2397.689326,Butte-Bozeman,hantavirus
+2026-05-03,0,Casper-Riverton,hantavirus
+2026-05-03,0,Cheyenne,hantavirus
+2026-05-03,1913.470569,Chico-Redding,hantavirus
+2026-05-03,1525.14082,Colorado,hantavirus
+2026-05-03,1413.053896,Denver,hantavirus
+2026-05-03,977.828663,El,hantavirus
+2026-05-03,2268.614093,Eugene,hantavirus
+2026-05-03,1215.803806,Fargo-Valley,hantavirus
+2026-05-03,964.557283,Fresno-Visalia,hantavirus
+2026-05-03,0,Grand,hantavirus
+2026-05-03,0,Great,hantavirus
+2026-05-03,1005.148628,Idaho,hantavirus
+2026-05-03,1657.326186,Las,hantavirus
+2026-05-03,1801.301563,Los,hantavirus
+2026-05-03,1264.38025,Lubbock,hantavirus
+2026-05-03,1088.044867,Medford-Klamath,hantavirus
+2026-05-03,0,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-03,0,Missoula,hantavirus
+2026-05-03,1449.619303,Odessa-Midland,hantavirus
+2026-05-03,1582.826809,Phoenix,hantavirus
+2026-05-03,2649.8059,Portland,hantavirus
+2026-05-03,0,Rapid,hantavirus
+2026-05-03,1758.254977,Reno,hantavirus
+2026-05-03,1616.681696,Sacramento-Stockton-Modesto,hantavirus
+2026-05-03,1681.635865,Salt,hantavirus
+2026-05-03,2257.289996,San,hantavirus
+2026-05-03,2926.387678,San,hantavirus
+2026-05-03,2459.929049,Seattle-Tacoma,hantavirus
+2026-05-03,1241.207657,Sioux,hantavirus
+2026-05-03,1506.113426,Spokane,hantavirus
+2026-05-03,2123.981136,Tucson,hantavirus
+2026-05-03,1966.071756,Twin,hantavirus
+2026-05-03,1334.015333,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-03,840.468109,Yuma,hantavirus
+2026-05-04,9006.034416,Albuquerque-Santa,hantavirus
+2026-05-04,10928.26436,Amarillo,hantavirus
+2026-05-04,7650.813998,Bakersfield,hantavirus
+2026-05-04,9271.833203,Bend,hantavirus
+2026-05-04,14482.6113,Billings,hantavirus
+2026-05-04,10135.77848,Boise,hantavirus
+2026-05-04,9855.240219,Butte-Bozeman,hantavirus
+2026-05-04,6393.058296,Casper-Riverton,hantavirus
+2026-05-04,3536.821756,Cheyenne,hantavirus
+2026-05-04,9617.077725,Chico-Redding,hantavirus
+2026-05-04,10183.94072,Colorado,hantavirus
+2026-05-04,7054.502015,Denver,hantavirus
+2026-05-04,8028.530806,El,hantavirus
+2026-05-04,10561.49112,Eugene,hantavirus
+2026-05-04,9380.988511,Fargo-Valley,hantavirus
+2026-05-04,7661.106084,Fresno-Visalia,hantavirus
+2026-05-04,8190.082791,Grand,hantavirus
+2026-05-04,7264.793752,Great,hantavirus
+2026-05-04,7812.6131,Idaho,hantavirus
+2026-05-04,9780.110842,Las,hantavirus
+2026-05-04,10507.63148,Los,hantavirus
+2026-05-04,9442.999605,Lubbock,hantavirus
+2026-05-04,8950.49309,Medford-Klamath,hantavirus
+2026-05-04,8489.811795,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-04,7089.187757,Missoula,hantavirus
+2026-05-04,10186.06402,Odessa-Midland,hantavirus
+2026-05-04,11860.31039,Phoenix,hantavirus
+2026-05-04,10972.8309,Portland,hantavirus
+2026-05-04,10012.84299,Rapid,hantavirus
+2026-05-04,8462.926873,Reno,hantavirus
+2026-05-04,9358.361024,Sacramento-Stockton-Modesto,hantavirus
+2026-05-04,9362.921937,Salt,hantavirus
+2026-05-04,11590.56461,San,hantavirus
+2026-05-04,10666.7034,San,hantavirus
+2026-05-04,11898.83006,Seattle-Tacoma,hantavirus
+2026-05-04,8902.240397,Sioux,hantavirus
+2026-05-04,9467.016695,Spokane,hantavirus
+2026-05-04,10973.97818,Tucson,hantavirus
+2026-05-04,6295.328919,Twin,hantavirus
+2026-05-04,6955.697843,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-04,7296.495482,Yuma,hantavirus
+2026-05-05,10564.44,Albuquerque-Santa,hantavirus
+2026-05-05,14600.70375,Amarillo,hantavirus
+2026-05-05,11825.45442,Bakersfield,hantavirus
+2026-05-05,12762.28898,Bend,hantavirus
+2026-05-05,15716.1956,Billings,hantavirus
+2026-05-05,12092.11095,Boise,hantavirus
+2026-05-05,11160.90743,Butte-Bozeman,hantavirus
+2026-05-05,11495.80007,Casper-Riverton,hantavirus
+2026-05-05,5879.009911,Cheyenne,hantavirus
+2026-05-05,10961.6011,Chico-Redding,hantavirus
+2026-05-05,14692.86436,Colorado,hantavirus
+2026-05-05,8509.44546,Denver,hantavirus
+2026-05-05,10710.1381,El,hantavirus
+2026-05-05,12246.09957,Eugene,hantavirus
+2026-05-05,12038.03185,Fargo-Valley,hantavirus
+2026-05-05,10843.81766,Fresno-Visalia,hantavirus
+2026-05-05,9281.166248,Grand,hantavirus
+2026-05-05,10552.23987,Great,hantavirus
+2026-05-05,9036.369507,Idaho,hantavirus
+2026-05-05,13180.97867,Las,hantavirus
+2026-05-05,12803.52028,Los,hantavirus
+2026-05-05,11843.29006,Lubbock,hantavirus
+2026-05-05,12399.48817,Medford-Klamath,hantavirus
+2026-05-05,10449.99891,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-05,10266.66452,Missoula,hantavirus
+2026-05-05,11791.48634,Odessa-Midland,hantavirus
+2026-05-05,13180.25524,Phoenix,hantavirus
+2026-05-05,13869.4959,Portland,hantavirus
+2026-05-05,13021.47588,Rapid,hantavirus
+2026-05-05,10385.99643,Reno,hantavirus
+2026-05-05,11935.93287,Sacramento-Stockton-Modesto,hantavirus
+2026-05-05,11738.56916,Salt,hantavirus
+2026-05-05,13849.59724,San,hantavirus
+2026-05-05,12116.71799,San,hantavirus
+2026-05-05,13623.44699,Seattle-Tacoma,hantavirus
+2026-05-05,12346.3204,Sioux,hantavirus
+2026-05-05,11360.85942,Spokane,hantavirus
+2026-05-05,12706.00858,Tucson,hantavirus
+2026-05-05,10740.66509,Twin,hantavirus
+2026-05-05,10542.18344,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-05,11381.10075,Yuma,hantavirus
+2026-05-06,20023.17698,Albuquerque-Santa,hantavirus
+2026-05-06,30140.36699,Amarillo,hantavirus
+2026-05-06,22409.82277,Bakersfield,hantavirus
+2026-05-06,21684.18979,Bend,hantavirus
+2026-05-06,31903.41559,Billings,hantavirus
+2026-05-06,23319.4976,Boise,hantavirus
+2026-05-06,23680.46319,Butte-Bozeman,hantavirus
+2026-05-06,22500.05002,Casper-Riverton,hantavirus
+2026-05-06,10052.83363,Cheyenne,hantavirus
+2026-05-06,21139.54377,Chico-Redding,hantavirus
+2026-05-06,25434.7364,Colorado,hantavirus
+2026-05-06,16175.05106,Denver,hantavirus
+2026-05-06,22625.63128,El,hantavirus
+2026-05-06,26004.64222,Eugene,hantavirus
+2026-05-06,26943.46158,Fargo-Valley,hantavirus
+2026-05-06,20655.27869,Fresno-Visalia,hantavirus
+2026-05-06,18993.65185,Grand,hantavirus
+2026-05-06,20959.15317,Great,hantavirus
+2026-05-06,18852.24336,Idaho,hantavirus
+2026-05-06,23329.48645,Las,hantavirus
+2026-05-06,23209.47781,Los,hantavirus
+2026-05-06,29623.05354,Lubbock,hantavirus
+2026-05-06,21467.0916,Medford-Klamath,hantavirus
+2026-05-06,21570.65831,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-06,17426.50819,Missoula,hantavirus
+2026-05-06,25807.5249,Odessa-Midland,hantavirus
+2026-05-06,24381.93712,Phoenix,hantavirus
+2026-05-06,25673.75874,Portland,hantavirus
+2026-05-06,22275.66827,Rapid,hantavirus
+2026-05-06,20602.45569,Reno,hantavirus
+2026-05-06,22305.82012,Sacramento-Stockton-Modesto,hantavirus
+2026-05-06,22891.70496,Salt,hantavirus
+2026-05-06,25840.22706,San,hantavirus
+2026-05-06,22144.69123,San,hantavirus
+2026-05-06,25835.52196,Seattle-Tacoma,hantavirus
+2026-05-06,26315.68814,Sioux,hantavirus
+2026-05-06,22857.27934,Spokane,hantavirus
+2026-05-06,24938.43963,Tucson,hantavirus
+2026-05-06,16745.39795,Twin,hantavirus
+2026-05-06,22028.47423,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-06,21633.24508,Yuma,hantavirus
+2026-05-07,43817.56916,Albuquerque-Santa,hantavirus
+2026-05-07,55484.34737,Amarillo,hantavirus
+2026-05-07,49671.3045,Bakersfield,hantavirus
+2026-05-07,52446.45455,Bend,hantavirus
+2026-05-07,54279.09973,Billings,hantavirus
+2026-05-07,47966.71717,Boise,hantavirus
+2026-05-07,51326.45613,Butte-Bozeman,hantavirus
+2026-05-07,38289.60128,Casper-Riverton,hantavirus
+2026-05-07,18717.30712,Cheyenne,hantavirus
+2026-05-07,49720.24464,Chico-Redding,hantavirus
+2026-05-07,52823.9778,Colorado,hantavirus
+2026-05-07,33661.86678,Denver,hantavirus
+2026-05-07,53274.49722,El,hantavirus
+2026-05-07,55311.00914,Eugene,hantavirus
+2026-05-07,48318.96821,Fargo-Valley,hantavirus
+2026-05-07,50658.84639,Fresno-Visalia,hantavirus
+2026-05-07,42059.09847,Grand,hantavirus
+2026-05-07,42556.11107,Great,hantavirus
+2026-05-07,44587.5629,Idaho,hantavirus
+2026-05-07,50726.13478,Las,hantavirus
+2026-05-07,52313.17966,Los,hantavirus
+2026-05-07,66391.05927,Lubbock,hantavirus
+2026-05-07,47309.28885,Medford-Klamath,hantavirus
+2026-05-07,47638.31955,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-07,46784.02358,Missoula,hantavirus
+2026-05-07,51026.60514,Odessa-Midland,hantavirus
+2026-05-07,65699.76827,Phoenix,hantavirus
+2026-05-07,52747.73101,Portland,hantavirus
+2026-05-07,46913.81804,Rapid,hantavirus
+2026-05-07,48754.82003,Reno,hantavirus
+2026-05-07,49344.92049,Sacramento-Stockton-Modesto,hantavirus
+2026-05-07,49618.33671,Salt,hantavirus
+2026-05-07,58706.91668,San,hantavirus
+2026-05-07,51034.13691,San,hantavirus
+2026-05-07,51238.30846,Seattle-Tacoma,hantavirus
+2026-05-07,50164.16072,Sioux,hantavirus
+2026-05-07,49803.39933,Spokane,hantavirus
+2026-05-07,62328.32786,Tucson,hantavirus
+2026-05-07,40855.07564,Twin,hantavirus
+2026-05-07,50029.59338,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-07,53446.98304,Yuma,hantavirus
+2026-05-08,42312.81386,Albuquerque-Santa,hantavirus
+2026-05-08,48886.0066,Amarillo,hantavirus
+2026-05-08,50102.84936,Bakersfield,hantavirus
+2026-05-08,57382.73128,Bend,hantavirus
+2026-05-08,47116.95729,Billings,hantavirus
+2026-05-08,48071.82685,Boise,hantavirus
+2026-05-08,45947.04321,Butte-Bozeman,hantavirus
+2026-05-08,47940.49937,Casper-Riverton,hantavirus
+2026-05-08,20228.94891,Cheyenne,hantavirus
+2026-05-08,45580.45881,Chico-Redding,hantavirus
+2026-05-08,49181.92026,Colorado,hantavirus
+2026-05-08,28354.28214,Denver,hantavirus
+2026-05-08,47681.83283,El,hantavirus
+2026-05-08,49440.16987,Eugene,hantavirus
+2026-05-08,46134.03823,Fargo-Valley,hantavirus
+2026-05-08,51164.80369,Fresno-Visalia,hantavirus
+2026-05-08,38314.0798,Grand,hantavirus
+2026-05-08,41816.83939,Great,hantavirus
+2026-05-08,45763.23992,Idaho,hantavirus
+2026-05-08,47140.39171,Las,hantavirus
+2026-05-08,47888.42043,Los,hantavirus
+2026-05-08,49054.221,Lubbock,hantavirus
+2026-05-08,46168.44588,Medford-Klamath,hantavirus
+2026-05-08,48303.12745,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-08,43201.81852,Missoula,hantavirus
+2026-05-08,47283.13308,Odessa-Midland,hantavirus
+2026-05-08,57510.36169,Phoenix,hantavirus
+2026-05-08,49744.79918,Portland,hantavirus
+2026-05-08,46549.57035,Rapid,hantavirus
+2026-05-08,50244.68223,Reno,hantavirus
+2026-05-08,47406.69745,Sacramento-Stockton-Modesto,hantavirus
+2026-05-08,45760.1504,Salt,hantavirus
+2026-05-08,49523.56864,San,hantavirus
+2026-05-08,46539.05822,San,hantavirus
+2026-05-08,47832.71561,Seattle-Tacoma,hantavirus
+2026-05-08,47124.34767,Sioux,hantavirus
+2026-05-08,44844.41168,Spokane,hantavirus
+2026-05-08,55427.28891,Tucson,hantavirus
+2026-05-08,42690.90395,Twin,hantavirus
+2026-05-08,45593.73924,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-08,54616.139,Yuma,hantavirus
+2026-05-09,27314.05687,Albuquerque-Santa,hantavirus
+2026-05-09,30203.17472,Amarillo,hantavirus
+2026-05-09,32900.16119,Bakersfield,hantavirus
+2026-05-09,32404.94858,Bend,hantavirus
+2026-05-09,29496.95003,Billings,hantavirus
+2026-05-09,29117.01381,Boise,hantavirus
+2026-05-09,29311.00312,Butte-Bozeman,hantavirus
+2026-05-09,28084.86301,Casper-Riverton,hantavirus
+2026-05-09,15575.13247,Cheyenne,hantavirus
+2026-05-09,26088.19182,Chico-Redding,hantavirus
+2026-05-09,33858.07765,Colorado,hantavirus
+2026-05-09,18259.01226,Denver,hantavirus
+2026-05-09,30683.54662,El,hantavirus
+2026-05-09,31818.67115,Eugene,hantavirus
+2026-05-09,27037.47898,Fargo-Valley,hantavirus
+2026-05-09,42107.69266,Fresno-Visalia,hantavirus
+2026-05-09,25294.81744,Grand,hantavirus
+2026-05-09,26587.02182,Great,hantavirus
+2026-05-09,29675.90445,Idaho,hantavirus
+2026-05-09,28795.751,Las,hantavirus
+2026-05-09,29396.31809,Los,hantavirus
+2026-05-09,28703.40381,Lubbock,hantavirus
+2026-05-09,31169.09889,Medford-Klamath,hantavirus
+2026-05-09,31937.24078,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-09,28540.39814,Missoula,hantavirus
+2026-05-09,26575.01614,Odessa-Midland,hantavirus
+2026-05-09,33168.26255,Phoenix,hantavirus
+2026-05-09,31390.23596,Portland,hantavirus
+2026-05-09,35442.79495,Rapid,hantavirus
+2026-05-09,34045.52912,Reno,hantavirus
+2026-05-09,30018.209,Sacramento-Stockton-Modesto,hantavirus
+2026-05-09,34415.92,Salt,hantavirus
+2026-05-09,31132.85891,San,hantavirus
+2026-05-09,29901.66622,San,hantavirus
+2026-05-09,30340.48517,Seattle-Tacoma,hantavirus
+2026-05-09,33784.83874,Sioux,hantavirus
+2026-05-09,29575.05246,Spokane,hantavirus
+2026-05-09,33611.98099,Tucson,hantavirus
+2026-05-09,28456.31237,Twin,hantavirus
+2026-05-09,28559.03139,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-09,29991.40397,Yuma,hantavirus
+2026-05-10,19843.7862,Albuquerque-Santa,hantavirus
+2026-05-10,20378.03487,Amarillo,hantavirus
+2026-05-10,24340.48428,Bakersfield,hantavirus
+2026-05-10,25263.01333,Bend,hantavirus
+2026-05-10,22404.75652,Billings,hantavirus
+2026-05-10,21642.30264,Boise,hantavirus
+2026-05-10,23507.84603,Butte-Bozeman,hantavirus
+2026-05-10,21050.22425,Casper-Riverton,hantavirus
+2026-05-10,10548.16497,Cheyenne,hantavirus
+2026-05-10,21082.17524,Chico-Redding,hantavirus
+2026-05-10,23833.93927,Colorado,hantavirus
+2026-05-10,13387.70452,Denver,hantavirus
+2026-05-10,20720.52365,El,hantavirus
+2026-05-10,21968.7324,Eugene,hantavirus
+2026-05-10,22211.98044,Fargo-Valley,hantavirus
+2026-05-10,27640.38849,Fresno-Visalia,hantavirus
+2026-05-10,19550.94661,Grand,hantavirus
+2026-05-10,22634.23265,Great,hantavirus
+2026-05-10,22667.91788,Idaho,hantavirus
+2026-05-10,21475.05949,Las,hantavirus
+2026-05-10,21490.95863,Los,hantavirus
+2026-05-10,19153.78242,Lubbock,hantavirus
+2026-05-10,22042.28669,Medford-Klamath,hantavirus
+2026-05-10,21344.59907,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-10,18538.15841,Missoula,hantavirus
+2026-05-10,19358.54653,Odessa-Midland,hantavirus
+2026-05-10,22507.25615,Phoenix,hantavirus
+2026-05-10,22306.20811,Portland,hantavirus
+2026-05-10,20937.97493,Rapid,hantavirus
+2026-05-10,21582.30194,Reno,hantavirus
+2026-05-10,21612.49461,Sacramento-Stockton-Modesto,hantavirus
+2026-05-10,23690.89089,Salt,hantavirus
+2026-05-10,22925.14375,San,hantavirus
+2026-05-10,23565.18912,San,hantavirus
+2026-05-10,21733.18914,Seattle-Tacoma,hantavirus
+2026-05-10,24440.83631,Sioux,hantavirus
+2026-05-10,21810.51652,Spokane,hantavirus
+2026-05-10,21610.85889,Tucson,hantavirus
+2026-05-10,19455.52395,Twin,hantavirus
+2026-05-10,18845.04602,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-10,19917.69652,Yuma,hantavirus
+2026-05-11,22718.20566,Albuquerque-Santa,hantavirus
+2026-05-11,25918.53338,Amarillo,hantavirus
+2026-05-11,25541.7372,Bakersfield,hantavirus
+2026-05-11,28147.9017,Bend,hantavirus
+2026-05-11,29583.41602,Billings,hantavirus
+2026-05-11,24715.51055,Boise,hantavirus
+2026-05-11,25246.95704,Butte-Bozeman,hantavirus
+2026-05-11,0,Casper-Riverton,hantavirus
+2026-05-11,20306.78451,Cheyenne,hantavirus
+2026-05-11,24880.38111,Chico-Redding,hantavirus
+2026-05-11,24887.60907,Colorado,hantavirus
+2026-05-11,16740.8003,Denver,hantavirus
+2026-05-11,26299.02177,El,hantavirus
+2026-05-11,28174.16452,Eugene,hantavirus
+2026-05-11,29493.66064,Fargo-Valley,hantavirus
+2026-05-11,29034.33193,Fresno-Visalia,hantavirus
+2026-05-11,0,Grand,hantavirus
+2026-05-11,34959.98964,Great,hantavirus
+2026-05-11,22139.10326,Idaho,hantavirus
+2026-05-11,27121.9237,Las,hantavirus
+2026-05-11,26870.9486,Los,hantavirus
+2026-05-11,25626.48446,Lubbock,hantavirus
+2026-05-11,28394.90792,Medford-Klamath,hantavirus
+2026-05-11,30434.21521,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-11,24226.63911,Missoula,hantavirus
+2026-05-11,16808.57532,Odessa-Midland,hantavirus
+2026-05-11,23489.2267,Phoenix,hantavirus
+2026-05-11,28727.32071,Portland,hantavirus
+2026-05-11,34386.98557,Rapid,hantavirus
+2026-05-11,25370.86543,Reno,hantavirus
+2026-05-11,26813.71726,Sacramento-Stockton-Modesto,hantavirus
+2026-05-11,24763.02262,Salt,hantavirus
+2026-05-11,27862.60647,San,hantavirus
+2026-05-11,33424.27459,San,hantavirus
+2026-05-11,24624.64322,Seattle-Tacoma,hantavirus
+2026-05-11,31650.53399,Sioux,hantavirus
+2026-05-11,25114.04999,Spokane,hantavirus
+2026-05-11,28398.04408,Tucson,hantavirus
+2026-05-11,33574.44312,Twin,hantavirus
+2026-05-11,26017.64002,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-11,26103.46227,Yuma,hantavirus
+2026-05-12,16776.35695,Albuquerque-Santa,hantavirus
+2026-05-12,15615.66567,Amarillo,hantavirus
+2026-05-12,21040.28461,Bakersfield,hantavirus
+2026-05-12,20707.42854,Bend,hantavirus
+2026-05-12,24936.9027,Billings,hantavirus
+2026-05-12,17400.84239,Boise,hantavirus
+2026-05-12,18081.35574,Butte-Bozeman,hantavirus
+2026-05-12,18057.14459,Casper-Riverton,hantavirus
+2026-05-12,13336.09212,Cheyenne,hantavirus
+2026-05-12,19681.81394,Chico-Redding,hantavirus
+2026-05-12,18528.03748,Colorado,hantavirus
+2026-05-12,12709.57207,Denver,hantavirus
+2026-05-12,16532.39582,El,hantavirus
+2026-05-12,19529.17842,Eugene,hantavirus
+2026-05-12,19249.57841,Fargo-Valley,hantavirus
+2026-05-12,26905.67381,Fresno-Visalia,hantavirus
+2026-05-12,14981.87562,Grand,hantavirus
+2026-05-12,18851.8604,Great,hantavirus
+2026-05-12,16526.83204,Idaho,hantavirus
+2026-05-12,16882.19991,Las,hantavirus
+2026-05-12,17613.30953,Los,hantavirus
+2026-05-12,15503.64904,Lubbock,hantavirus
+2026-05-12,18230.22936,Medford-Klamath,hantavirus
+2026-05-12,18964.04093,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-12,18238.87117,Missoula,hantavirus
+2026-05-12,13184.74537,Odessa-Midland,hantavirus
+2026-05-12,18171.31289,Phoenix,hantavirus
+2026-05-12,23798.03808,Portland,hantavirus
+2026-05-12,18022.22589,Rapid,hantavirus
+2026-05-12,19256.33962,Reno,hantavirus
+2026-05-12,29590.70032,Sacramento-Stockton-Modesto,hantavirus
+2026-05-12,19333.95086,Salt,hantavirus
+2026-05-12,19548.08647,San,hantavirus
+2026-05-12,21688.6163,San,hantavirus
+2026-05-12,28959.54378,Seattle-Tacoma,hantavirus
+2026-05-12,20817.37332,Sioux,hantavirus
+2026-05-12,19432.29809,Spokane,hantavirus
+2026-05-12,18023.93799,Tucson,hantavirus
+2026-05-12,20485.01176,Twin,hantavirus
+2026-05-12,22817.611,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-12,16236.25835,Yuma,hantavirus
+2026-05-13,12306.09445,Albuquerque-Santa,hantavirus
+2026-05-13,11210.51039,Amarillo,hantavirus
+2026-05-13,15842.62608,Bakersfield,hantavirus
+2026-05-13,32639.67954,Bend,hantavirus
+2026-05-13,16686.51076,Billings,hantavirus
+2026-05-13,12936.02055,Boise,hantavirus
+2026-05-13,12914.19885,Butte-Bozeman,hantavirus
+2026-05-13,12907.02242,Casper-Riverton,hantavirus
+2026-05-13,6730.174854,Cheyenne,hantavirus
+2026-05-13,15209.98208,Chico-Redding,hantavirus
+2026-05-13,14120.97232,Colorado,hantavirus
+2026-05-13,9357.102803,Denver,hantavirus
+2026-05-13,12034.16855,El,hantavirus
+2026-05-13,20764.42188,Eugene,hantavirus
+2026-05-13,19574.93171,Fargo-Valley,hantavirus
+2026-05-13,21418.65822,Fresno-Visalia,hantavirus
+2026-05-13,11742.11212,Grand,hantavirus
+2026-05-13,15039.63524,Great,hantavirus
+2026-05-13,11222.50711,Idaho,hantavirus
+2026-05-13,12332.89468,Las,hantavirus
+2026-05-13,12432.68444,Los,hantavirus
+2026-05-13,10672.17431,Lubbock,hantavirus
+2026-05-13,18312.99294,Medford-Klamath,hantavirus
+2026-05-13,18194.98355,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-13,12109.06379,Missoula,hantavirus
+2026-05-13,10284.14554,Odessa-Midland,hantavirus
+2026-05-13,12614.74055,Phoenix,hantavirus
+2026-05-13,22109.16466,Portland,hantavirus
+2026-05-13,12687.07411,Rapid,hantavirus
+2026-05-13,13064.16071,Reno,hantavirus
+2026-05-13,20142.85755,Sacramento-Stockton-Modesto,hantavirus
+2026-05-13,13162.08991,Salt,hantavirus
+2026-05-13,13153.16824,San,hantavirus
+2026-05-13,15788.49691,San,hantavirus
+2026-05-13,27357.26338,Seattle-Tacoma,hantavirus
+2026-05-13,14118.31054,Sioux,hantavirus
+2026-05-13,17138.48049,Spokane,hantavirus
+2026-05-13,12278.77408,Tucson,hantavirus
+2026-05-13,14013.86962,Twin,hantavirus
+2026-05-13,20659.32856,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-13,12026.44911,Yuma,hantavirus
+2026-05-14,9297.951332,Albuquerque-Santa,hantavirus
+2026-05-14,8334.858785,Amarillo,hantavirus
+2026-05-14,9414.240934,Bakersfield,hantavirus
+2026-05-14,15066.91128,Bend,hantavirus
+2026-05-14,12197.80833,Billings,hantavirus
+2026-05-14,10009.86202,Boise,hantavirus
+2026-05-14,9186.435352,Butte-Bozeman,hantavirus
+2026-05-14,12118.89409,Casper-Riverton,hantavirus
+2026-05-14,6056.038711,Cheyenne,hantavirus
+2026-05-14,11368.51516,Chico-Redding,hantavirus
+2026-05-14,10898.59577,Colorado,hantavirus
+2026-05-14,7067.012618,Denver,hantavirus
+2026-05-14,9186.670058,El,hantavirus
+2026-05-14,13972.88707,Eugene,hantavirus
+2026-05-14,12727.83541,Fargo-Valley,hantavirus
+2026-05-14,13637.89054,Fresno-Visalia,hantavirus
+2026-05-14,9030.567421,Grand,hantavirus
+2026-05-14,10312.69395,Great,hantavirus
+2026-05-14,8059.446282,Idaho,hantavirus
+2026-05-14,9358.350588,Las,hantavirus
+2026-05-14,9603.276937,Los,hantavirus
+2026-05-14,8075.550104,Lubbock,hantavirus
+2026-05-14,12118.39692,Medford-Klamath,hantavirus
+2026-05-14,12150.4211,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-14,8325.03668,Missoula,hantavirus
+2026-05-14,8033.69518,Odessa-Midland,hantavirus
+2026-05-14,10040.44785,Phoenix,hantavirus
+2026-05-14,13954.5162,Portland,hantavirus
+2026-05-14,10888.71959,Rapid,hantavirus
+2026-05-14,9493.631275,Reno,hantavirus
+2026-05-14,13609.18315,Sacramento-Stockton-Modesto,hantavirus
+2026-05-14,9496.340797,Salt,hantavirus
+2026-05-14,10210.38544,San,hantavirus
+2026-05-14,10953.14449,San,hantavirus
+2026-05-14,15021.666,Seattle-Tacoma,hantavirus
+2026-05-14,10915.90048,Sioux,hantavirus
+2026-05-14,11221.10435,Spokane,hantavirus
+2026-05-14,9635.629455,Tucson,hantavirus
+2026-05-14,10735.09931,Twin,hantavirus
+2026-05-14,13644.90705,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-14,9168.359402,Yuma,hantavirus
+2026-05-15,7818.275477,Albuquerque-Santa,hantavirus
+2026-05-15,7134.177391,Amarillo,hantavirus
+2026-05-15,7564.496525,Bakersfield,hantavirus
+2026-05-15,11663.70924,Bend,hantavirus
+2026-05-15,9150.68353,Billings,hantavirus
+2026-05-15,7407.454066,Boise,hantavirus
+2026-05-15,5537.685912,Butte-Bozeman,hantavirus
+2026-05-15,8090.324148,Casper-Riverton,hantavirus
+2026-05-15,5747.150945,Cheyenne,hantavirus
+2026-05-15,8060.857611,Chico-Redding,hantavirus
+2026-05-15,7178.595205,Colorado,hantavirus
+2026-05-15,5606.116395,Denver,hantavirus
+2026-05-15,6180.63173,El,hantavirus
+2026-05-15,9276.06144,Eugene,hantavirus
+2026-05-15,10118.98391,Fargo-Valley,hantavirus
+2026-05-15,9832.113014,Fresno-Visalia,hantavirus
+2026-05-15,6401.382387,Grand,hantavirus
+2026-05-15,10642.15223,Great,hantavirus
+2026-05-15,7014.707488,Idaho,hantavirus
+2026-05-15,7242.548073,Las,hantavirus
+2026-05-15,7528.19303,Los,hantavirus
+2026-05-15,7505.473118,Lubbock,hantavirus
+2026-05-15,9699.966965,Medford-Klamath,hantavirus
+2026-05-15,10220.43362,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-15,6809.106025,Missoula,hantavirus
+2026-05-15,6394.436984,Odessa-Midland,hantavirus
+2026-05-15,7603.114933,Phoenix,hantavirus
+2026-05-15,9849.412603,Portland,hantavirus
+2026-05-15,8165.782559,Rapid,hantavirus
+2026-05-15,7782.560175,Reno,hantavirus
+2026-05-15,9942.133584,Sacramento-Stockton-Modesto,hantavirus
+2026-05-15,6901.5404,Salt,hantavirus
+2026-05-15,7382.24147,San,hantavirus
+2026-05-15,8459.30551,San,hantavirus
+2026-05-15,11125.80591,Seattle-Tacoma,hantavirus
+2026-05-15,7841.154069,Sioux,hantavirus
+2026-05-15,9379.793658,Spokane,hantavirus
+2026-05-15,7732.003805,Tucson,hantavirus
+2026-05-15,8720.731245,Twin,hantavirus
+2026-05-15,9791.857264,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-15,7431.552188,Yuma,hantavirus
+2026-05-16,6429.101766,Albuquerque-Santa,hantavirus
+2026-05-16,6388.275975,Amarillo,hantavirus
+2026-05-16,6860.848652,Bakersfield,hantavirus
+2026-05-16,7663.051145,Bend,hantavirus
+2026-05-16,8308.558681,Billings,hantavirus
+2026-05-16,5802.976061,Boise,hantavirus
+2026-05-16,4695.245851,Butte-Bozeman,hantavirus
+2026-05-16,4905.968208,Casper-Riverton,hantavirus
+2026-05-16,6240.065606,Cheyenne,hantavirus
+2026-05-16,6503.586901,Chico-Redding,hantavirus
+2026-05-16,7733.183146,Colorado,hantavirus
+2026-05-16,6705.6481,Denver,hantavirus
+2026-05-16,5749.370411,El,hantavirus
+2026-05-16,7442.024413,Eugene,hantavirus
+2026-05-16,8276.732788,Fargo-Valley,hantavirus
+2026-05-16,7987.991695,Fresno-Visalia,hantavirus
+2026-05-16,5239.307999,Grand,hantavirus
+2026-05-16,5856.408658,Great,hantavirus
+2026-05-16,6371.831577,Idaho,hantavirus
+2026-05-16,6020.750107,Las,hantavirus
+2026-05-16,6502.512291,Los,hantavirus
+2026-05-16,4979.408127,Lubbock,hantavirus
+2026-05-16,7266.669183,Medford-Klamath,hantavirus
+2026-05-16,9826.664039,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-16,5436.341637,Missoula,hantavirus
+2026-05-16,6647.31491,Odessa-Midland,hantavirus
+2026-05-16,6518.219681,Phoenix,hantavirus
+2026-05-16,8405.148888,Portland,hantavirus
+2026-05-16,5637.012187,Rapid,hantavirus
+2026-05-16,6686.689521,Reno,hantavirus
+2026-05-16,7879.781733,Sacramento-Stockton-Modesto,hantavirus
+2026-05-16,6508.733575,Salt,hantavirus
+2026-05-16,6866.570442,San,hantavirus
+2026-05-16,7460.001252,San,hantavirus
+2026-05-16,11345.65133,Seattle-Tacoma,hantavirus
+2026-05-16,6665.147757,Sioux,hantavirus
+2026-05-16,9845.619834,Spokane,hantavirus
+2026-05-16,6422.315316,Tucson,hantavirus
+2026-05-16,6882.860171,Twin,hantavirus
+2026-05-16,10117.75032,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-16,8112.879649,Yuma,hantavirus
+2026-05-17,5058.128113,Albuquerque-Santa,hantavirus
+2026-05-17,4385.598241,Amarillo,hantavirus
+2026-05-17,5777.421706,Bakersfield,hantavirus
+2026-05-17,5905.452037,Bend,hantavirus
+2026-05-17,5646.806559,Billings,hantavirus
+2026-05-17,4697.603389,Boise,hantavirus
+2026-05-17,4880.213486,Butte-Bozeman,hantavirus
+2026-05-17,4915.897637,Casper-Riverton,hantavirus
+2026-05-17,5906.684812,Cheyenne,hantavirus
+2026-05-17,5565.066186,Chico-Redding,hantavirus
+2026-05-17,9264.499763,Colorado,hantavirus
+2026-05-17,6551.660459,Denver,hantavirus
+2026-05-17,4783.809897,El,hantavirus
+2026-05-17,6521.178551,Eugene,hantavirus
+2026-05-17,6390.509448,Fargo-Valley,hantavirus
+2026-05-17,6115.519579,Fresno-Visalia,hantavirus
+2026-05-17,6329.128045,Grand,hantavirus
+2026-05-17,7091.438168,Great,hantavirus
+2026-05-17,5712.436926,Idaho,hantavirus
+2026-05-17,5164.539932,Las,hantavirus
+2026-05-17,5400.778711,Los,hantavirus
+2026-05-17,5338.160424,Lubbock,hantavirus
+2026-05-17,4133.039029,Medford-Klamath,hantavirus
+2026-05-17,7207.124407,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-17,5127.587463,Missoula,hantavirus
+2026-05-17,4588.605759,Odessa-Midland,hantavirus
+2026-05-17,5543.23885,Phoenix,hantavirus
+2026-05-17,6311.98256,Portland,hantavirus
+2026-05-17,6678.025735,Rapid,hantavirus
+2026-05-17,5001.126624,Reno,hantavirus
+2026-05-17,6831.525255,Sacramento-Stockton-Modesto,hantavirus
+2026-05-17,5329.727648,Salt,hantavirus
+2026-05-17,5456.951633,San,hantavirus
+2026-05-17,6146.269825,San,hantavirus
+2026-05-17,8259.103334,Seattle-Tacoma,hantavirus
+2026-05-17,5070.506588,Sioux,hantavirus
+2026-05-17,6517.710953,Spokane,hantavirus
+2026-05-17,5091.455054,Tucson,hantavirus
+2026-05-17,4135.361216,Twin,hantavirus
+2026-05-17,7114.705634,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-17,6568.436276,Yuma,hantavirus
+2026-05-18,5021.896989,Albuquerque-Santa,hantavirus
+2026-05-18,5124.993862,Amarillo,hantavirus
+2026-05-18,5273.625297,Bakersfield,hantavirus
+2026-05-18,6699.982422,Bend,hantavirus
+2026-05-18,5492.361128,Billings,hantavirus
+2026-05-18,4135.998655,Boise,hantavirus
+2026-05-18,4708.383068,Butte-Bozeman,hantavirus
+2026-05-18,5433.53697,Casper-Riverton,hantavirus
+2026-05-18,4598.538039,Cheyenne,hantavirus
+2026-05-18,3978.69983,Chico-Redding,hantavirus
+2026-05-18,8078.212812,Colorado,hantavirus
+2026-05-18,5526.240058,Denver,hantavirus
+2026-05-18,4202.351792,El,hantavirus
+2026-05-18,5487.869162,Eugene,hantavirus
+2026-05-18,5341.731726,Fargo-Valley,hantavirus
+2026-05-18,6322.629992,Fresno-Visalia,hantavirus
+2026-05-18,6087.638601,Grand,hantavirus
+2026-05-18,4526.297329,Great,hantavirus
+2026-05-18,4923.820523,Idaho,hantavirus
+2026-05-18,4975.800538,Las,hantavirus
+2026-05-18,4893.167806,Los,hantavirus
+2026-05-18,4026.038488,Lubbock,hantavirus
+2026-05-18,5616.294673,Medford-Klamath,hantavirus
+2026-05-18,6721.528436,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-18,4969.77726,Missoula,hantavirus
+2026-05-18,4236.399343,Odessa-Midland,hantavirus
+2026-05-18,4824.806802,Phoenix,hantavirus
+2026-05-18,5837.280691,Portland,hantavirus
+2026-05-18,4990.880101,Rapid,hantavirus
+2026-05-18,4802.092231,Reno,hantavirus
+2026-05-18,5860.79001,Sacramento-Stockton-Modesto,hantavirus
+2026-05-18,5608.828731,Salt,hantavirus
+2026-05-18,4739.612784,San,hantavirus
+2026-05-18,5520.04522,San,hantavirus
+2026-05-18,6578.413277,Seattle-Tacoma,hantavirus
+2026-05-18,4299.031388,Sioux,hantavirus
+2026-05-18,6029.686647,Spokane,hantavirus
+2026-05-18,4613.958968,Tucson,hantavirus
+2026-05-18,7533.701097,Twin,hantavirus
+2026-05-18,6086.208306,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-18,5561.324761,Yuma,hantavirus
+2026-05-19,3534.265438,Albuquerque-Santa,hantavirus
+2026-05-19,2510.98408,Amarillo,hantavirus
+2026-05-19,4776.361981,Bakersfield,hantavirus
+2026-05-19,4636.012659,Bend,hantavirus
+2026-05-19,3662.15292,Billings,hantavirus
+2026-05-19,2902.630185,Boise,hantavirus
+2026-05-19,4536.050336,Butte-Bozeman,hantavirus
+2026-05-19,5519.86216,Casper-Riverton,hantavirus
+2026-05-19,4655.753093,Cheyenne,hantavirus
+2026-05-19,3476.119353,Chico-Redding,hantavirus
+2026-05-19,5337.700649,Colorado,hantavirus
+2026-05-19,4570.913776,Denver,hantavirus
+2026-05-19,3539.450554,El,hantavirus
+2026-05-19,4142.19187,Eugene,hantavirus
+2026-05-19,3878.996059,Fargo-Valley,hantavirus
+2026-05-19,4452.481429,Fresno-Visalia,hantavirus
+2026-05-19,4510.638391,Grand,hantavirus
+2026-05-19,4726.263321,Great,hantavirus
+2026-05-19,3045.870606,Idaho,hantavirus
+2026-05-19,3590.855254,Las,hantavirus
+2026-05-19,3687.787975,Los,hantavirus
+2026-05-19,2885.782519,Lubbock,hantavirus
+2026-05-19,4124.138523,Medford-Klamath,hantavirus
+2026-05-19,4245.963196,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-19,3943.316725,Missoula,hantavirus
+2026-05-19,3446.44549,Odessa-Midland,hantavirus
+2026-05-19,3556.366765,Phoenix,hantavirus
+2026-05-19,4226.425132,Portland,hantavirus
+2026-05-19,3914.018424,Rapid,hantavirus
+2026-05-19,4265.932987,Reno,hantavirus
+2026-05-19,4522.968763,Sacramento-Stockton-Modesto,hantavirus
+2026-05-19,3696.902672,Salt,hantavirus
+2026-05-19,3764.543416,San,hantavirus
+2026-05-19,4059.102819,San,hantavirus
+2026-05-19,5409.023345,Seattle-Tacoma,hantavirus
+2026-05-19,3362.516763,Sioux,hantavirus
+2026-05-19,3937.772953,Spokane,hantavirus
+2026-05-19,3479.369135,Tucson,hantavirus
+2026-05-19,5505.318906,Twin,hantavirus
+2026-05-19,4571.935512,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-19,4092.975088,Yuma,hantavirus
+2026-05-20,3453.108888,Albuquerque-Santa,hantavirus
+2026-05-20,2522.435485,Amarillo,hantavirus
+2026-05-20,3081.548541,Bakersfield,hantavirus
+2026-05-20,3179.14852,Bend,hantavirus
+2026-05-20,2738.635245,Billings,hantavirus
+2026-05-20,3419.858765,Boise,hantavirus
+2026-05-20,2464.900977,Butte-Bozeman,hantavirus
+2026-05-20,4282.737156,Casper-Riverton,hantavirus
+2026-05-20,3066.403362,Cheyenne,hantavirus
+2026-05-20,3013.371675,Chico-Redding,hantavirus
+2026-05-20,4029.521592,Colorado,hantavirus
+2026-05-20,3144.893662,Denver,hantavirus
+2026-05-20,2377.550719,El,hantavirus
+2026-05-20,3316.381034,Eugene,hantavirus
+2026-05-20,3597.66168,Fargo-Valley,hantavirus
+2026-05-20,3689.914231,Fresno-Visalia,hantavirus
+2026-05-20,4406.48996,Grand,hantavirus
+2026-05-20,3568.20105,Great,hantavirus
+2026-05-20,2301.620618,Idaho,hantavirus
+2026-05-20,2946.081858,Las,hantavirus
+2026-05-20,2965.721781,Los,hantavirus
+2026-05-20,2642.301684,Lubbock,hantavirus
+2026-05-20,3327.28916,Medford-Klamath,hantavirus
+2026-05-20,3237.283795,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-20,3562.801941,Missoula,hantavirus
+2026-05-20,1692.971952,Odessa-Midland,hantavirus
+2026-05-20,3044.330572,Phoenix,hantavirus
+2026-05-20,3323.566712,Portland,hantavirus
+2026-05-20,2978.591164,Rapid,hantavirus
+2026-05-20,3349.853217,Reno,hantavirus
+2026-05-20,3667.578449,Sacramento-Stockton-Modesto,hantavirus
+2026-05-20,3109.097493,Salt,hantavirus
+2026-05-20,2830.447308,San,hantavirus
+2026-05-20,3087.572176,San,hantavirus
+2026-05-20,3863.149984,Seattle-Tacoma,hantavirus
+2026-05-20,2841.477448,Sioux,hantavirus
+2026-05-20,3156.944796,Spokane,hantavirus
+2026-05-20,2579.001982,Tucson,hantavirus
+2026-05-20,3030.647611,Twin,hantavirus
+2026-05-20,4352.369991,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-20,2683.092064,Yuma,hantavirus
+2026-05-21,3119.757761,Albuquerque-Santa,hantavirus
+2026-05-21,2631.207273,Amarillo,hantavirus
+2026-05-21,2581.093262,Bakersfield,hantavirus
+2026-05-21,3329.263921,Bend,hantavirus
+2026-05-21,3051.845987,Billings,hantavirus
+2026-05-21,2487.033878,Boise,hantavirus
+2026-05-21,1964.135256,Butte-Bozeman,hantavirus
+2026-05-21,3966.614282,Casper-Riverton,hantavirus
+2026-05-21,2172.454764,Cheyenne,hantavirus
+2026-05-21,2665.18612,Chico-Redding,hantavirus
+2026-05-21,2831.731318,Colorado,hantavirus
+2026-05-21,2460.690334,Denver,hantavirus
+2026-05-21,2446.909991,El,hantavirus
+2026-05-21,2710.867455,Eugene,hantavirus
+2026-05-21,3379.344016,Fargo-Valley,hantavirus
+2026-05-21,3061.826981,Fresno-Visalia,hantavirus
+2026-05-21,3336.768886,Grand,hantavirus
+2026-05-21,3471.252801,Great,hantavirus
+2026-05-21,1503.579095,Idaho,hantavirus
+2026-05-21,2413.285027,Las,hantavirus
+2026-05-21,2589.388118,Los,hantavirus
+2026-05-21,2441.498418,Lubbock,hantavirus
+2026-05-21,2685.849256,Medford-Klamath,hantavirus
+2026-05-21,3470.138583,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-21,1775.142141,Missoula,hantavirus
+2026-05-21,1697.498624,Odessa-Midland,hantavirus
+2026-05-21,2447.037993,Phoenix,hantavirus
+2026-05-21,2897.420784,Portland,hantavirus
+2026-05-21,3055.824876,Rapid,hantavirus
+2026-05-21,2786.424697,Reno,hantavirus
+2026-05-21,3091.914181,Sacramento-Stockton-Modesto,hantavirus
+2026-05-21,2451.27083,Salt,hantavirus
+2026-05-21,2569.795705,San,hantavirus
+2026-05-21,2843.439276,San,hantavirus
+2026-05-21,3131.16477,Seattle-Tacoma,hantavirus
+2026-05-21,2223.950382,Sioux,hantavirus
+2026-05-21,2877.241464,Spokane,hantavirus
+2026-05-21,2847.342571,Tucson,hantavirus
+2026-05-21,2896.083555,Twin,hantavirus
+2026-05-21,3115.662826,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-21,2461.786131,Yuma,hantavirus
+2026-05-22,2547.46042,Albuquerque-Santa,hantavirus
+2026-05-22,2776.179092,Amarillo,hantavirus
+2026-05-22,2666.980483,Bakersfield,hantavirus
+2026-05-22,2461.214946,Bend,hantavirus
+2026-05-22,2737.849353,Billings,hantavirus
+2026-05-22,2734.385411,Boise,hantavirus
+2026-05-22,2395.001418,Butte-Bozeman,hantavirus
+2026-05-22,2790.836827,Casper-Riverton,hantavirus
+2026-05-22,2853.816705,Cheyenne,hantavirus
+2026-05-22,2605.649018,Chico-Redding,hantavirus
+2026-05-22,2959.335375,Colorado,hantavirus
+2026-05-22,2322.243958,Denver,hantavirus
+2026-05-22,2244.694636,El,hantavirus
+2026-05-22,2948.94701,Eugene,hantavirus
+2026-05-22,2812.165363,Fargo-Valley,hantavirus
+2026-05-22,2578.854738,Fresno-Visalia,hantavirus
+2026-05-22,2349.670713,Grand,hantavirus
+2026-05-22,3392.053197,Great,hantavirus
+2026-05-22,2034.890628,Idaho,hantavirus
+2026-05-22,2685.836975,Las,hantavirus
+2026-05-22,2440.424153,Los,hantavirus
+2026-05-22,1354.257638,Lubbock,hantavirus
+2026-05-22,3616.635959,Medford-Klamath,hantavirus
+2026-05-22,2998.246474,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-22,2991.350233,Missoula,hantavirus
+2026-05-22,2093.986463,Odessa-Midland,hantavirus
+2026-05-22,2513.295788,Phoenix,hantavirus
+2026-05-22,3162.599089,Portland,hantavirus
+2026-05-22,2275.379047,Rapid,hantavirus
+2026-05-22,2615.155332,Reno,hantavirus
+2026-05-22,2861.495829,Sacramento-Stockton-Modesto,hantavirus
+2026-05-22,2398.628307,Salt,hantavirus
+2026-05-22,2242.61289,San,hantavirus
+2026-05-22,2462.958218,San,hantavirus
+2026-05-22,3289.508947,Seattle-Tacoma,hantavirus
+2026-05-22,2368.285866,Sioux,hantavirus
+2026-05-22,3146.126998,Spokane,hantavirus
+2026-05-22,2624.193115,Tucson,hantavirus
+2026-05-22,2744.163429,Twin,hantavirus
+2026-05-22,3077.215644,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-22,1941.463074,Yuma,hantavirus
+2026-05-23,2084.529039,Albuquerque-Santa,hantavirus
+2026-05-23,1817.677844,Amarillo,hantavirus
+2026-05-23,2338.106808,Bakersfield,hantavirus
+2026-05-23,1459.412958,Bend,hantavirus
+2026-05-23,2235.889522,Billings,hantavirus
+2026-05-23,2015.854014,Boise,hantavirus
+2026-05-23,1551.747607,Butte-Bozeman,hantavirus
+2026-05-23,2603.689559,Casper-Riverton,hantavirus
+2026-05-23,0,Cheyenne,hantavirus
+2026-05-23,2002.87272,Chico-Redding,hantavirus
+2026-05-23,2605.532144,Colorado,hantavirus
+2026-05-23,1882.576985,Denver,hantavirus
+2026-05-23,1892.016082,El,hantavirus
+2026-05-23,2166.458998,Eugene,hantavirus
+2026-05-23,2136.038117,Fargo-Valley,hantavirus
+2026-05-23,2669.2153,Fresno-Visalia,hantavirus
+2026-05-23,1680.484531,Grand,hantavirus
+2026-05-23,2641.664062,Great,hantavirus
+2026-05-23,2288.187021,Idaho,hantavirus
+2026-05-23,2019.804146,Las,hantavirus
+2026-05-23,2338.150069,Los,hantavirus
+2026-05-23,1535.443485,Lubbock,hantavirus
+2026-05-23,2061.787238,Medford-Klamath,hantavirus
+2026-05-23,2515.992796,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-23,2540.473468,Missoula,hantavirus
+2026-05-23,1469.821463,Odessa-Midland,hantavirus
+2026-05-23,2184.173701,Phoenix,hantavirus
+2026-05-23,2585.615018,Portland,hantavirus
+2026-05-23,2800.313024,Rapid,hantavirus
+2026-05-23,2031.378525,Reno,hantavirus
+2026-05-23,2595.570051,Sacramento-Stockton-Modesto,hantavirus
+2026-05-23,2081.105581,Salt,hantavirus
+2026-05-23,1908.313389,San,hantavirus
+2026-05-23,2168.564294,San,hantavirus
+2026-05-23,2599.023201,Seattle-Tacoma,hantavirus
+2026-05-23,1854.402686,Sioux,hantavirus
+2026-05-23,2481.783726,Spokane,hantavirus
+2026-05-23,1853.198954,Tucson,hantavirus
+2026-05-23,2521.839675,Twin,hantavirus
+2026-05-23,2786.589615,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-23,2952.550417,Yuma,hantavirus
+2026-05-24,2273.204251,Albuquerque-Santa,hantavirus
+2026-05-24,1428.412654,Amarillo,hantavirus
+2026-05-24,2064.79122,Bakersfield,hantavirus
+2026-05-24,1902.823554,Bend,hantavirus
+2026-05-24,1874.534317,Billings,hantavirus
+2026-05-24,2171.993422,Boise,hantavirus
+2026-05-24,2137.218438,Butte-Bozeman,hantavirus
+2026-05-24,0,Casper-Riverton,hantavirus
+2026-05-24,2804.548749,Cheyenne,hantavirus
+2026-05-24,1390.511455,Chico-Redding,hantavirus
+2026-05-24,2512.560762,Colorado,hantavirus
+2026-05-24,1894.30446,Denver,hantavirus
+2026-05-24,1977.726283,El,hantavirus
+2026-05-24,2031.825015,Eugene,hantavirus
+2026-05-24,2693.072538,Fargo-Valley,hantavirus
+2026-05-24,2293.509025,Fresno-Visalia,hantavirus
+2026-05-24,1583.202567,Grand,hantavirus
+2026-05-24,3759.201865,Great,hantavirus
+2026-05-24,1507.73386,Idaho,hantavirus
+2026-05-24,1702.465809,Las,hantavirus
+2026-05-24,1953.329688,Los,hantavirus
+2026-05-24,1380.481685,Lubbock,hantavirus
+2026-05-24,2327.924049,Medford-Klamath,hantavirus
+2026-05-24,2111.995609,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-24,2488.548379,Missoula,hantavirus
+2026-05-24,1558.360565,Odessa-Midland,hantavirus
+2026-05-24,1998.756659,Phoenix,hantavirus
+2026-05-24,2079.420575,Portland,hantavirus
+2026-05-24,2146.029502,Rapid,hantavirus
+2026-05-24,2090.745222,Reno,hantavirus
+2026-05-24,2295.563617,Sacramento-Stockton-Modesto,hantavirus
+2026-05-24,2004.677589,Salt,hantavirus
+2026-05-24,1868.84098,San,hantavirus
+2026-05-24,2014.708426,San,hantavirus
+2026-05-24,2261.698631,Seattle-Tacoma,hantavirus
+2026-05-24,1530.793894,Sioux,hantavirus
+2026-05-24,2426.061275,Spokane,hantavirus
+2026-05-24,2164.210355,Tucson,hantavirus
+2026-05-24,2575.852107,Twin,hantavirus
+2026-05-24,2774.260469,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-24,1322.438218,Yuma,hantavirus
+2026-05-25,2215.299806,Albuquerque-Santa,hantavirus
+2026-05-25,2653.146946,Amarillo,hantavirus
+2026-05-25,2265.838813,Bakersfield,hantavirus
+2026-05-25,2427.533446,Bend,hantavirus
+2026-05-25,1994.380203,Billings,hantavirus
+2026-05-25,1663.671444,Boise,hantavirus
+2026-05-25,2278.44215,Butte-Bozeman,hantavirus
+2026-05-25,0,Casper-Riverton,hantavirus
+2026-05-25,1932.230345,Cheyenne,hantavirus
+2026-05-25,2442.517448,Chico-Redding,hantavirus
+2026-05-25,2537.862466,Colorado,hantavirus
+2026-05-25,1508.387856,Denver,hantavirus
+2026-05-25,1843.966856,El,hantavirus
+2026-05-25,2212.305413,Eugene,hantavirus
+2026-05-25,2185.995982,Fargo-Valley,hantavirus
+2026-05-25,2174.101675,Fresno-Visalia,hantavirus
+2026-05-25,1537.965186,Grand,hantavirus
+2026-05-25,2930.182641,Great,hantavirus
+2026-05-25,2149.97183,Idaho,hantavirus
+2026-05-25,1621.816714,Las,hantavirus
+2026-05-25,1821.045083,Los,hantavirus
+2026-05-25,1435.358219,Lubbock,hantavirus
+2026-05-25,1792.413013,Medford-Klamath,hantavirus
+2026-05-25,2477.956563,Minot-Bismarck-Dickinson(Williston),hantavirus
+2026-05-25,1410.639244,Missoula,hantavirus
+2026-05-25,1742.432017,Odessa-Midland,hantavirus
+2026-05-25,2032.524383,Phoenix,hantavirus
+2026-05-25,2026.384955,Portland,hantavirus
+2026-05-25,2083.120398,Rapid,hantavirus
+2026-05-25,2459.192556,Reno,hantavirus
+2026-05-25,2241.328555,Sacramento-Stockton-Modesto,hantavirus
+2026-05-25,1834.974897,Salt,hantavirus
+2026-05-25,1783.759236,San,hantavirus
+2026-05-25,2036.240344,San,hantavirus
+2026-05-25,2213.8664,Seattle-Tacoma,hantavirus
+2026-05-25,1988.933065,Sioux,hantavirus
+2026-05-25,2359.021018,Spokane,hantavirus
+2026-05-25,2115.954195,Tucson,hantavirus
+2026-05-25,0,Twin,hantavirus
+2026-05-25,2000.995217,Yakima-Pasco-Richland-Kennewick,hantavirus
+2026-05-25,2250.866231,Yuma,hantavirus`;
 
 // Parser: handles repeated "San" by tagging first/second occurrence per date.
 function parseCSV(text){
@@ -603,7 +1256,7 @@ function useRAF(cb, active){
 // usePlayback: virtual time index in [0, n-1] that auto-advances at `speed` units/sec.
 // Returns { vIdx, playing, setPlaying, setVIdx, speed, setSpeed, reset }.
 function usePlayback(n, opts={}){
-  const { speed: initSpeed = 0.6, loop = true } = opts;
+  const { speed: initSpeed = 0.2, loop = true } = opts;
   const [playing, setPlaying] = useState(true);
   const [vIdx, setVIdx]     = useState(0);
   const [speed, setSpeed]   = useState(initSpeed);
@@ -624,7 +1277,7 @@ function usePlayback(n, opts={}){
 }
 
 // useAnimatedNumber: eases a number toward a target.
-function useAnimatedNumber(target, durationMs = 700){
+function useAnimatedNumber(target, durationMs = 1400){
   const [v, setV] = useState(target);
   const fromRef = useRef(target);
   const startRef = useRef(performance.now());
@@ -687,7 +1340,7 @@ function Stat({ label, value, sub, tone="slate" }){
   return (
     <div className="flex flex-col">
       <span className="uppercase tracking-widest text-[10px] text-slate-500">{label}</span>
-      <span className={`text-2xl font-semibold mono ${map[tone]}`}>{value}</span>
+      <span className={`text-3xl font-bold mono ${map[tone]}`}>{value}</span>
       {sub && <span className="text-xs text-slate-400 mt-0.5">{sub}</span>}
     </div>
   );
@@ -964,7 +1617,7 @@ function App(){
   }, [dmaAgg]);
 
   // ----- Playback engine: virtual time index in [0, dates.length - 1] -----
-  const playback = usePlayback(dates.length, { speed: 0.6, loop: true });
+  const playback = usePlayback(dates.length, { speed: 0.2, loop: true });
   const vIdx = playback.vIdx;
   const iA = Math.max(0, Math.min(dates.length-1, Math.floor(vIdx)));
   const iB = Math.min(dates.length-1, iA + 1);
@@ -1001,8 +1654,9 @@ function App(){
   // Risk advisory (national-level threshold)
   const advisory = (() => {
     const latest = national[national.length-1];
-    if (latest.Mean > 30000) return { level:"HIGH",     tone:"red",   note:"Sustained nationwide surge; mean SearchInterest > 30k across Western DMAs." };
-    if (latest.Mean > 5000)  return { level:"ELEVATED", tone:"amber", note:"Rapid silence-break detected; signal active across majority of Western DMAs." };
+    if (latest.Mean > 20000) return { level:"HIGH",     tone:"red",   note:"Sustained nationwide surge; mean SearchInterest > 20k across Western DMAs." };
+    if (latest.Mean > 5000)  return { level:"ELEVATED", tone:"amber", note:"Active signal across majority of Western DMAs; possible secondary wave dynamics." };
+    if (latest.Mean > 500)   return { level:"WATCH",    tone:"cyan",  note:"Decaying signal toward post-outbreak baseline; localized hotspots may persist." };
     return { level:"LOW", tone:"em", note:"Baseline ecological dormancy; routine vigilance." };
   })();
 
@@ -1011,20 +1665,22 @@ function App(){
   // Live ticker items — derived from data + ArcGIS overlay
   const tickerItems = useMemo(()=>{
     const items = [];
-    items.push({ tone:"red",   tag:"PEAK",          msg:`${peakRow.DMA_Name} reached ${fmt(peakRow.SearchInterest)} on ${peakRow.Date}` });
-    items.push({ tone:"amber", tag:"SURGE",         msg:`National Σ jumped from ${fmt(t0.Total)} → ${fmt(tpk.Total)} (${surgeMult>1000?"≥10³":surgeMult.toFixed(0)+"×"})` });
-    items.push({ tone:"em",    tag:"SILENCE-BREAK", msg:`${silenceBroken.length}/${dmas.length} rural DMAs recovered from k-anon suppression` });
-    items.push({ tone:"cyan",  tag:"WHO",           msg:"DON599 — Andes virus cluster (MV Hondius); strain ID via CBC News" });
-    items.push({ tone:"red",   tag:"CDC",           msg:"HPS clinical guidance active for Western US DMAs" });
+    items.push({ tone:"red",   tag:"PEAK-1",        msg:`First wave peak: ${peakRow.DMA_Name} reached ${fmt(peakRow.SearchInterest)} on ${peakRow.Date}` });
+    items.push({ tone:"amber", tag:"PEAK-2",        msg:`Second wave: Pacific NW corridor (Bend OR, Seattle-Tacoma) re-ignites May 13-16 — bimodal signature confirmed` });
+    items.push({ tone:"amber", tag:"SURGE",         msg:`National Σ trajectory ${fmt(t0.Total)} → ${fmt(tpk.Total)} (${surgeMult>1000?"≥10³":surgeMult.toFixed(0)+"×"})` });
+    items.push({ tone:"em",    tag:"SILENCE-BREAK", msg:`${silenceBroken.length}/${dmas.length} rural DMAs recovered from k-anonymity suppression via Grouped Expressions` });
+    items.push({ tone:"cyan",  tag:"WHO",           msg:"DON599 — Andes virus cluster (MV Hondius); strain ID confirmed (CBC News, Nature sequencing)" });
+    items.push({ tone:"red",   tag:"CDC",           msg:"HPS clinical guidance active for Western US DMAs; Lubbock TX action vector flagged" });
     if (arc.ok && arc.counts){
       items.push({ tone:"red",   tag:"ARCGIS", msg:`Live overlay · Confirmed ${arc.counts.CONFIRMED} · Deceased ${arc.counts.DECEASED} · Suspected ${arc.counts.SUSPECTED} · Monitoring ${arc.counts.MONITORING}` });
     } else {
-      items.push({ tone:"cyan",  tag:"ARCGIS", msg:"FeatureServer/1 polling every 60s — fallback to direct link if CORS-blocked" });
+      items.push({ tone:"cyan",  tag:"ARCGIS", msg:"FeatureServer/1 polling every 60s — fallback link active if CORS-blocked" });
     }
-    items.push({ tone:"amber", tag:"ECDC",  msg:"Weekly Communicable Disease Threats Report — EU returnees monitored" });
-    items.push({ tone:"em",    tag:"PAHO",  msg:"Americas-region surveillance · Argentina + Chile reservoir tracking" });
+    items.push({ tone:"amber", tag:"ECDC",  msg:"Weekly CDTR — EU returnees from MV Hondius monitored across Spain, Germany, France, UK, NL, CH, PT" });
+    items.push({ tone:"em",    tag:"PAHO",  msg:"Americas-region surveillance · Andes virus reservoir Argentina (Patagonia) + Chile" });
+    items.push({ tone:"cyan",  tag:"WINDOW",msg:`Data window ${dateFirst} → ${dateLast} · ${dates.length} days · ${dmas.length} Western US DMAs` });
     return items;
-  }, [peakRow, t0, tpk, surgeMult, silenceBroken, dmas, arc]);
+  }, [peakRow, t0, tpk, surgeMult, silenceBroken, dmas, dates, dateFirst, dateLast, arc]);
 
   const [hover, setHover] = useState(null);
   useEffect(()=>{ if (window.lucide) window.lucide.createIcons(); });
@@ -1039,20 +1695,31 @@ function App(){
       <header className="sticky top-0 z-30 bg-slate-950/85 backdrop-blur border-b border-slate-800/80">
         <div className="max-w-[1500px] mx-auto px-5 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-red-500/15 border border-red-500/40 flex items-center justify-center">{I("biohazard","w-5 h-5 text-red-400")}</div>
+            <div className="w-11 h-11 rounded-lg flex items-center justify-center" style={{ background: "var(--ndsu-green)", border: "1px solid var(--ndsu-gold)", boxShadow: "0 0 14px rgba(255,200,46,.35)" }}>
+              {I("biohazard","w-6 h-6")}
+              <style>{`[data-lucide="biohazard"]{ color: var(--ndsu-gold); }`}</style>
+            </div>
             <div>
-              <div className="text-sm uppercase tracking-[0.25em] text-slate-300">E-BEWS USA · Hantavirus Digital Epidemiology</div>
-              <div className="text-xs text-slate-500 mono">Command Center · DMA Resolution · Google Health Trends v1alpha + ArcGIS FeatureServer overlay</div>
+              <div className="text-base md:text-lg font-bold tracking-tight text-slate-100">Hantavirus Digital Epidemiology Command Center</div>
+              <div className="text-[11px] md:text-xs text-slate-400 mono">
+                <a href="https://www.ndsu.edu/people/akshaya-bhagavathula" target="_blank" rel="noreferrer" className="text-ndsu-gold hover:underline">Akshaya Bhagavathula, PhD FACE</a>
+                <span className="text-slate-500"> · </span>
+                Professor of Epidemiology, Department of Public Health
+                <span className="text-slate-500"> · </span>
+                <span className="text-ndsu-green">North Dakota State University, Fargo, ND USA</span>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-400">
-            <span className="pulse-dot">LIVE</span>
+            <span className="pulse-dot text-ndsu-gold">LIVE</span>
             <Pill color="slate">data window {dateFirst} → {dateLast}</Pill>
-            <Pill color="amber">t = {snapDate}</Pill>
+            <span className="ndsu-pill px-2 py-0.5 rounded-full text-[11px] mono">t = {snapDate}</span>
+            <Pill color="em">CDC · WHO presentation</Pill>
             <Pill color={advisory.tone}>{advisory.level} RISK</Pill>
           </div>
         </div>
       </header>
+      <div className="ndsu-band"></div>
 
       <Ticker items={tickerItems}/>
 
@@ -1064,7 +1731,7 @@ function App(){
           </button>
           <button className="btn-ghost" onClick={()=> playback.reset()}>⟲ Reset</button>
           <div className="flex items-center gap-1">
-            {[0.25, 0.6, 1.2, 2.5].map(s => (
+            {[0.1, 0.2, 0.5, 1.0].map(s => (
               <button key={s} className="btn-ghost" data-active={playback.speed===s} onClick={()=> playback.setSpeed(s)}>{s}×</button>
             ))}
           </div>
@@ -1083,10 +1750,10 @@ function App(){
 
         {/* ===== EXECUTIVE CARDS ===== */}
         <section className="col-span-12 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-          <Card title="Live National Σ (interpolated)" subtitle={`now @ t = ${snapDate} → ${snapDateNext}`} glow="red" icon={I("activity","w-4 h-4 text-red-400")}>
+          <Card title="Live National Σ (interpolated)" subtitle={`now @ t = ${snapDate} → ${snapDateNext}`} glow="ndsu" icon={I("activity","w-4 h-4 text-ndsu-gold")}>
             <div className="flex flex-col">
               <span className="uppercase tracking-widest text-[10px] text-slate-500">Σ SearchInterest</span>
-              <span className="text-2xl font-semibold mono text-red-400"><AnimatedNumber value={nationalNow.Total} format={fmt}/></span>
+              <span className="text-3xl font-bold mono text-ndsu-gold"><AnimatedNumber value={nationalNow.Total} format={fmt}/></span>
               <span className="text-xs text-slate-400 mt-0.5">mean <AnimatedNumber value={nationalNow.Mean} format={fmt}/> · active <AnimatedNumber value={nationalNow.ActiveDMAs} format={x=>Math.round(x)}/>/{dmas.length}</span>
             </div>
           </Card>
@@ -1126,9 +1793,14 @@ function App(){
                   <YAxis tick={{ fill:"#94a3b8", fontSize:10 }} tickFormatter={fmt}/>
                   <Tooltip contentStyle={{ background:"#0f172a", border:"1px solid #334155", color:"#e2e8f0" }} formatter={(v)=> fmt(v)} />
                   <Area  type="monotone" dataKey="Total"    stroke="#ef4444" fill="url(#gTot)" name="Σ SearchInterest"/>
-                  <Line  type="monotone" dataKey="Peak"     stroke="#f59e0b" dot={true} strokeWidth={2} name="Daily peak DMA"/>
+                  <Line  type="monotone" dataKey="Peak"     stroke="#f59e0b" dot={true} strokeWidth={3} name="Daily peak DMA"/>
                   <ReferenceLine x={tpk.Date} stroke="#fbbf24" strokeDasharray="3 3" label={{ value:`peak ${tpk.Date}`, fill:"#fbbf24", fontSize:10, position:"insideTop" }}/>
-                  <ReferenceArea x1={dates[0]} x2={dates[1]} fill="#22d3ee" fillOpacity={0.08} stroke="none" label={{ value:"rural silence", fill:"#67e8f9", fontSize:10, position:"insideTop" }}/>
+                  <ReferenceArea x1={dates[0]} x2={dates[1]} fill="#22d3ee" fillOpacity={0.10} stroke="none" label={{ value:"rural silence", fill:"#67e8f9", fontSize:10, position:"insideTop" }}/>
+                  {/* Bimodal annotations — wave 1 & wave 2 windows */}
+                  <ReferenceArea x1={dates[2]} x2={dates[7] || dates[dates.length-1]} fill="#ef4444" fillOpacity={0.05} stroke="none" label={{ value:"WAVE 1", fill:"#fca5a5", fontSize:10, position:"top" }}/>
+                  {dates.length > 12 && (
+                    <ReferenceArea x1={dates[10]} x2={dates[15] || dates[dates.length-1]} fill="#f59e0b" fillOpacity={0.05} stroke="none" label={{ value:"WAVE 2", fill:"#fcd34d", fontSize:10, position:"top" }}/>
+                  )}
                   {/* Live sweep marker — moves as playback advances */}
                   <ReferenceLine x={snapDate} stroke="#fde68a" strokeWidth={2} label={{ value:"NOW", fill:"#fde68a", fontSize:10, position:"top" }}/>
                 </ComposedChart>
@@ -1333,8 +2005,8 @@ function App(){
                 UKHSA, RKI Germany, Santé publique France, BAG Switzerland, Amsterdam UMC (NOS) — monitoring contacts.
               </div>
               <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
-                <div className="text-violet-300 font-semibold mb-1">USA digital echo</div>
-                Western US DMA signal lights up May 3+ — likely media-driven public concern post WHO DON599 + CBC strain ID. Endemic CDC HPS surveillance background overlays.
+                <div className="text-violet-300 font-semibold mb-1">USA digital echo · bimodal</div>
+                Wave 1 (May 3–8) — synchronous nationwide silence-break following WHO DON599 + CBC strain ID. Wave 2 (May 11–16) — Pacific NW + N. Rockies re-ignite, led by Bend OR, Seattle-Tacoma, Great Falls MT. Decay through May 17–25 toward elevated baseline.
               </div>
             </div>
             <div className="mt-3 text-[11px] text-slate-400">
@@ -1345,7 +2017,7 @@ function App(){
 
         {/* ===== METHODOLOGY ===== */}
         <section className="col-span-12">
-          <Card title="Methodology · Grouped Expression + Digital Epidemiology" subtitle="Breaking the 'Rural Silence' imposed by k-anonymity" glow="cyan" icon={I("scroll-text","w-4 h-4 text-cyan-300")}>
+          <Card title="Methodology · Grouped Expression + Digital Epidemiology" subtitle="Breaking the 'Rural Silence' imposed by k-anonymity · Akshaya Bhagavathula, NDSU" glow="ndsu" icon={I("scroll-text","w-4 h-4 text-ndsu-gold")}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm leading-relaxed text-slate-300">
               <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-3">
                 <div className="text-cyan-300 font-semibold mb-1">1 · The k-anonymity problem</div>
@@ -1454,8 +2126,19 @@ function App(){
           </Card>
         </section>
 
-        <footer className="col-span-12 text-center text-[11px] text-slate-500 py-4">
-          E-BEWS USA · data: <span className="mono">Hantavirus_DMA_Master_Merge.csv</span> ({rows.length} rows · {dmas.length} DMAs · {dates.length} days). For situational awareness only, not medical advice.
+        <footer className="col-span-12 text-center text-[11px] text-slate-400 py-4 border-t border-slate-800 mt-2">
+          <div className="flex flex-col items-center gap-1">
+            <div>
+              <a href="https://www.ndsu.edu/people/akshaya-bhagavathula" target="_blank" rel="noreferrer" className="text-ndsu-gold hover:underline font-semibold">Akshaya Bhagavathula, PhD FACE</a>
+              <span className="text-slate-500"> · </span>
+              Professor of Epidemiology, Department of Public Health
+              <span className="text-slate-500"> · </span>
+              <span className="text-ndsu-green font-semibold">North Dakota State University</span>, Fargo, ND USA
+            </div>
+            <div className="text-[10px] text-slate-500 mono">
+              data: Hantavirus_DMA_Master_Merge.csv ({rows.length} rows · {dmas.length} DMAs · {dates.length} days · {dateFirst} → {dateLast}) · For situational awareness only, not medical advice.
+            </div>
+          </div>
         </footer>
       </main>
     </div>
